@@ -16,7 +16,7 @@
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "~@ionic/angular/css/padding.css";
@@ -24,3 +24,38 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.button-width-menu {
+  width: 5rem;
+  margin-left: -1rem;
+  position: absolute;
+  z-index: 1;
+  padding-top: 0.3rem;
+}
+.toolbar-mini-padding {
+  margin-top: 0.8rem;
+  position: relative;
+}
+.background-img-1 {
+  --background: url("../src/assets/sharky.jpg") 0 0/100% 100% no-repeat;
+}
+.background-img-2 {
+  background-color: rgba(255, 255, 255, 0) !important;
+}
+
+.ion-color-apppersonalized {
+  --ion-color-base: var(--ion-color-apppersonalized);
+  --ion-color-base-rgb: var(--ion-color-apppersonalized-rgb);
+  --ion-color-contrast: var(--ion-color-apppersonalized-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-apppersonalized-contrast-rgb);
+  --ion-color-shade: var(--ion-color-apppersonalized-shade);
+  --ion-color-tint: var(--ion-color-apppersonalized-tint);
+}
+.ion-color-transparent {
+    --ion-color-base: var(--ion-color-transparent);
+    --ion-color-base-rgb: var(--ion-color-transparent-rgb);
+    --ion-color-contrast: var(--ion-color-transparent-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-transparent-contrast-rgb);
+    --ion-color-shade: var(--ion-color-transparent-shade);
+    --ion-color-tint: var(--ion-color-transparent-tint);
+  }

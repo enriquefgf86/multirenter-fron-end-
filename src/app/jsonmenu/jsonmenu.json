@@ -1,0 +1,31 @@
+[
+    {"src":"../../assets/home.svg",
+     "title":"Home",
+     "url":"/"
+    },
+    {"src":"../../assets/rentProduct.svg",
+     "title":"Products",
+     "url":"/"
+    },
+    {"src":"../../assets/dashboard.svg",
+     "title":"My dashboard",
+     "url":"/"
+    },
+    {"src":"../../assets/admin.svg",
+     "title":"Admin Dashboard",
+     "url":"/"
+    },
+    {"src":"../../assets/about.svg",
+     "title":"About Me",
+     "url":"/"
+    },
+    {"src":"../../assets/home.svg",
+     "title":"Login",
+     "url":"/"
+    }
+    ,
+    {"src":"../../assets/home.svg",
+     "title":"Sign Up",
+     "url":"/"
+    }
+]

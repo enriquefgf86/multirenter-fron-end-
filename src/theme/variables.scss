@@ -74,7 +74,22 @@
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  //personalized
+  --ion-color-apppersonalized: #C197D2;
+  --ion-color-apppersonalized-rgb: 193,151,210;
+  --ion-color-apppersonalized-contrast: #000000;
+  --ion-color-apppersonalized-contrast-rgb: 0,0,0;
+  --ion-color-apppersonalized-shade: #aa85b9;
+  --ion-color-apppersonalized-tint: #c7a1d7;
+
+  
+
+
+
+
 }
+
 
 @media (prefers-color-scheme: dark) {
   /*
