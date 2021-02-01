@@ -1,28 +1,47 @@
 <ion-content>
-  <form>
+  <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
     <ion-grid fixed>
       <ion-row>
         <ion-col class='ion-aling-self-center' size="6" size-md='4' size-lg='3' size-sm='12' size-xs='12'>
+
           <ion-item-group class='ion-aling-self-center' text-center>
-            <ion-item text-center>
-              <h3 >Login</h3>
+            <ion-chip color="apppersonalized">
+              <ion-label color="apppersonalized">
+                Login
+              </ion-label>
+            </ion-chip>
+          </ion-item-group>
+
+          <ion-item-group padding>
+
+            <ion-item>
+              <ion-input formControlName="username" type="text" placeholder="your@email.com" ngModel required>
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-input formControlName="password" type="password" placeholder="Password" ngModel required></ion-input>
             </ion-item>
 
           </ion-item-group>
+
           <ion-item-group padding>
-            <ion-item>
-              <ion-input name="email" type="email" placeholder="your@email.com" ngModel required></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-input name="password" type="password" placeholder="Password" ngModel required></ion-input>
-            </ion-item>
+            <ion-button color="apppersonalized" size="large" type="submit" expand="block">
+              <h3 style="color:white" >Login</h3>
+            </ion-button>
           </ion-item-group>
-          <ion-item-group padding>
-            <ion-button color="apppersonalized" size="large" type="submit" expand="block">Login</ion-button>
-          </ion-item-group>
+
         </ion-col>
       </ion-row>
     </ion-grid>
 
   </form>
+  <ion-item-group padding class="ion-text-center">
+    <ion-item>
+      <ion-label class="ion-text-center">Aren't you a User?</ion-label>
+    </ion-item>
+    <ion-button size="small" color="light" (click)="goToSignUp()">
+      <ion-label color="apppersonalized">Go to Register</ion-label>
+    </ion-button>
+  </ion-item-group>
 </ion-content>

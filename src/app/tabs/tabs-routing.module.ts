@@ -12,11 +12,11 @@ const routes: Routes = [
         loadChildren: () =>
           import("../tab1/tab1.module").then((m) => m.Tab1PageModule),
       },
-      {
-        path: "tab2",
-        loadChildren: () =>
-          import("../tab2/tab2.module").then((m) => m.Tab2PageModule),
-      },
+      // {
+      //   path: "tab2",
+      //   loadChildren: () =>
+      //     import("../tab2/tab2.module").then((m) => m.Tab2PageModule),
+      // },
       {
         path: "tab3",
         loadChildren: () =>
@@ -37,6 +37,11 @@ const routes: Routes = [
         path: "tab6",
         loadChildren: () =>
           import("../tab6/tab6.module").then((m) => m.Tab6PageModule),
+      },
+      {
+        path: "tab7",
+        loadChildren: () =>
+          import("../tab7/tab7.module").then((m) => m.Tab7PageModule),
       },
 
       {

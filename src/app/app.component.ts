@@ -1,33 +1,42 @@
-import { MenuController } from '@ionic/angular';
-import { GetmenusService } from './services/getmenus.service';
-import { Component, OnInit } from '@angular/core';
+import { HttpsService } from "./services/https.service";
+import { MenuController } from "@ionic/angular";
+import { GetmenusService } from "./services/getmenus.service";
+import { Component, OnInit } from "@angular/core";
 
-import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { Observable } from 'rxjs';
-import { Interfaces } from './interfaces/interfaces.interface';
+import { Platform } from "@ionic/angular";
+import { SplashScreen } from "@ionic-native/splash-screen/ngx";
+import { StatusBar } from "@ionic-native/status-bar/ngx";
+import { Observable } from "rxjs";
+import { Interfaces, tokengenerated } from "./interfaces/interfaces.interface";
+import { Storage } from "@ionic/storage";
+//decoding jwt
+import jwt_decode from "jwt-decode";
+import { Store } from "@ngrx/store";
+import { GlobalAppState } from "./globalReducer.reducer";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  selector: "app-root",
+  templateUrl: "app.component.html",
+  styleUrls: ["app.component.scss"],
 })
 export class AppComponent implements OnInit {
+  menuComponents: Interfaces[];
+  token: string;
 
-  menuComponents:Interfaces[];
-  
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private allMenuComponents:GetmenusService,
-    private menu:MenuController
+    private allMenuComponents: GetmenusService,
+    private menu: MenuController,
+    private httpServices: HttpsService,
+    private tokenStorage: Storage,
+    private stateStore: Store<GlobalAppState>
   ) {
     this.initializeApp();
   }
-  ngOnInit(): void {
-    this.menuComponents=this.allMenuComponents.getMenusOptions();
+  async ngOnInit() {
+    this.stateFetcher();
   }
 
   initializeApp() {
@@ -35,26 +44,50 @@ export class AppComponent implements OnInit {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
     });
-    
   }
-  openFirst() {
-    this.menu.enable(true, 'first');
-    this.menu.open('first');
-  }
+  async openFirst() {
+    await this.stateFetcher();
+    this.menu.open("first");
+  } //abriendo menu lateral de id first
 
   closeFirst() {
-    this.menu.enable(true, 'first');
-    this.menu.close('first');
+    // this.menu.enable(true, "first");
+    this.menu.close("first");
+  } //fucnion para cerrar  menu lateral de id first
+
+  async logOut() {
+    let token = await this.token;
+    await console.log(token);
+    await this.httpServices.logOutUser().then(() => {
+      this.closeFirst();
+    });
+  } //log out user
+
+  stateFetcher() {
+    this.stateStore.select("authReducers").subscribe((data) => {
+      let authoritiesOfUser: string[] = ["NO_ROLE"];
+      //se establece una variable que supliria la no existencia de authoridad en el
+      //redux por un valor para que no se de null
+     
+      if (data.dedToken) {
+        authoritiesOfUser = data.dedToken.authorities;
+      }
+      //establecindose una condicion que demarca que se cogeria el valore que
+      //traiga la data referente al token decodificado especificamente el apartado
+      //de authorities [NO_ROLE] en la variable authoritiesOfUser,
+
+      this.menuComponents = this.allMenuComponents.getMenusOptions(
+        data.userAuth,
+        authoritiesOfUser
+      );
+      //se le asigna a la variable menuComponents cualesquiera el valor que traiga
+      //el metodo del servicio getMenusOptions, pasando como parametros los elementos
+      //traidos desde el Store redux como son el userIsauth y la variable authoritiesOfUser
+      //emulando los authorities del token decodificado del redux on en el caso contrario
+      //el valor previamente demarcado[NO_ROLE]
+    });
   }
-
-
-  openEnd() {
-    this.menu.open('end');
-  }
-
-  openCustom() {
-    this.menu.enable(true, 'custom');
-    this.menu.open('custom');
-  }
-
+  //metodo encargado de filtrar el menu segun el usuario logeado y su authridad.Para ello se le pasa
+  //al metodo de susbcripcion de  al redux , buscando especificamente el isAuth asi como lo referente
+  //al token decodificado para de e;l accedera las autoridades
 }

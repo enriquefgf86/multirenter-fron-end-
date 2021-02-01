@@ -1,0 +1,69 @@
+<ion-content class="backi my-modal">
+  <ion-card>
+
+    <ion-item color="lightapppersonalized ">
+
+      <ion-label slot="start">
+        <ion-text color="apppersonalized" >
+          <h2 style="font-weight: bold;"> Create Product</h2>
+        </ion-text>
+      </ion-label>
+      <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+
+    </ion-item>
+
+    <form [formGroup]="createProdForm" (ngSubmit)="createProd()">
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Name Of Product to Add <ion-text color="danger">*
+          </ion-text>
+        </ion-label>
+        <ion-input required formControlName="productName" type="text"></ion-input>
+      </ion-item>
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " color="apppersonalized " position="floating">Select Product Sub Type
+        </ion-label>
+        <ion-select placeholder="Select One" formControlName="productSubType">
+          <ion-select-option required *ngFor="let item of productSubType; let i=index" ngDefaultControl
+            [value]="item.id">
+            {{item.productSubType}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Select Product Type </ion-label>
+        <ion-select placeholder="Select One" formControlName="productType">
+          <ion-select-option required *ngFor="let item of productType; let i=index" ngDefaultControl [value]="item.id">
+            {{item.productType}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Select Product Price </ion-label>
+        <ion-select placeholder="Select One" formControlName="productPrice">
+          <ion-select-option required *ngFor="let item of pricesProduct; let i=index" ngDefaultControl
+            [value]="item.id_fee">${{item.price_per_day}}.00/per day </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Select Product Fee </ion-label>
+        <ion-select placeholder="Select One" formControlName="productFeeDelay">
+          <ion-select-option required *ngFor="let item of feesProduct; let i=index" ngDefaultControl
+            [value]="item.id_fee">${{item.charge_per_day}}.00/per day</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="flex-ionic" color="lightapppersonalized ">
+        <ion-button color="apppersonalized " type="submit" [disabled]="createProdForm.invalid">
+          <ion-text style="color:white">
+            Create
+          </ion-text>
+        </ion-button>
+      </div>
+
+    </form>
+
+  </ion-card>
+</ion-content>

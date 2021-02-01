@@ -51,11 +51,141 @@
   --ion-color-shade: var(--ion-color-apppersonalized-shade);
   --ion-color-tint: var(--ion-color-apppersonalized-tint);
 }
+
+.ion-color-lightapppersonalized {
+  --ion-color-base: var(--ion-color-lightapppersonalized);
+  --ion-color-base-rgb: var(--ion-color-lightapppersonalized-rgb);
+  --ion-color-contrast: var(--ion-color-lightapppersonalized-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-lightapppersonalized-contrast-rgb);
+  --ion-color-shade: var(--ion-color-lightapppersonalized-shade);
+  --ion-color-tint: var(--ion-color-lightapppersonalized-tint);
+}
 .ion-color-transparent {
-    --ion-color-base: var(--ion-color-transparent);
-    --ion-color-base-rgb: var(--ion-color-transparent-rgb);
-    --ion-color-contrast: var(--ion-color-transparent-contrast);
-    --ion-color-contrast-rgb: var(--ion-color-transparent-contrast-rgb);
-    --ion-color-shade: var(--ion-color-transparent-shade);
-    --ion-color-tint: var(--ion-color-transparent-tint);
+  --ion-color-base: var(--ion-color-transparent);
+  --ion-color-base-rgb: var(--ion-color-transparent-rgb);
+  --ion-color-contrast: var(--ion-color-transparent-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-transparent-contrast-rgb);
+  --ion-color-shade: var(--ion-color-transparent-shade);
+  --ion-color-tint: var(--ion-color-transparent-tint);
+}
+
+.my-font-size {
+  font-size: 0.8rem;
+}
+.slider-img {
+  width: 9rem;
+  height: 9rem;
+}
+.slider-img1 {
+  width: 2rem;
+  height: 2rem;
+  margin-top: -0.5rem;
+}
+.row-height {
+  height: 2rem;
+}
+.badge-color-1 {
+  color: white;
+  background-color: green;
+}
+.badge-color-2 {
+  color: white;
+  background-color: red;
+}
+.card-img-top {
+  width: 100%;
+  height: 9rem;
+  object-fit: cover;
+}
+.card-img-top1 {
+  width: 100%;
+  height: 2rem;
+  object-fit: cover;
+}
+
+.ion-menu {
+  --ion-background-color: var(--ion-color-lightapppersonalized);
+}
+.img-upload {
+  width: 2rem;
+  height: 100%;
+}
+.div-button-edition {
+  background-color: #ccbad4;
+  position: relative;
+  height: 9rem;
+}
+
+.centered-button {
+  margin: 0;
+  position: relative;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  height: auto; //Auto adjust height (maintain aspect ratio)
+}
+
+.flex-ionic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  background-color: var(--ion-color-lightapppersonalized);
+}
+
+.backi {
+  --background: url("./assets/backgroundApp.jpg") no-repeat center center /
+    cover;
+  height: 5rem;
+  // opacity: 0.5;
+}
+.text-input {
+  --placeholder-color: red;
+}
+.my-modal {
+  height: 50px !important;
+}
+.chip-background {
+  background-color: var(--ion-color-lightapppersonalized);
+}
+.card-createImage-settings {
+  background-color: var(--ion-color-lightapppersonalized);
+}
+
+////////////////querys para las imagenes del tab 4//////////
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  /* Styles */
+  .centered-button {
+    width: 11rem;
+    height: auto; //Auto adjust height (maintain aspect ratio)
   }
+}
+
+/* Smartphones (landscape) ----------- */
+@media only screen and (min-width: 321px) {
+  .centered-button {
+    width: 11rem;
+    height: auto; //Auto adjust height (maintain aspect ratio)
+    margin: 0;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+}
+
+/* Smartphones (portrait) ----------- */
+@media only screen and (max-width: 320px) {
+  .centered-button {
+    width: 11rem;
+    height: auto; //Auto adjust height (maintain aspect ratio)
+    margin: 0;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+}
