@@ -3,7 +3,7 @@
 
     <ion-label slot="start">
       <ion-text color="apppersonalized">
-        <h2 style="font-weight: bold;"> Settings Create Product</h2>
+        <h2 style="font-weight: bold;"> Settings Edit Product</h2>
       </ion-text>
     </ion-label>
     <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
@@ -15,24 +15,24 @@
 
       <ion-col size="12" class="ion-align-items-center">
         <ion-chip color="apppersonalized" class="chip-background"  mode="ios" outline="true">
-          <ion-button color="apppersonalized" color="apppersonalized" (click)="createProduct()" expand="block" fill="clear" shape="round">
-            Create Product
+          <ion-button color="apppersonalized" color="apppersonalized" (click)="editProduct()" expand="block" fill="clear" shape="round">
+            Edit Product
           </ion-button>
         </ion-chip>
       </ion-col>
 
       <ion-col size="12">
         <ion-chip color="apppersonalized" class="chip-background" mode="ios" outline="true">
-          <ion-button color="apppersonalized" (click)="createProductSubType()" expand="block" fill="clear" shape="round">
-            Create Product Sub Type
+          <ion-button color="apppersonalized" (click)="editProductSubType()" expand="block" fill="clear" shape="round">
+            Edit Product Sub Type
           </ion-button>
         </ion-chip>
       </ion-col>
 
       <ion-col size="12">
         <ion-chip color="apppersonalized" class="chip-background" mode="ios" outline="true">
-          <ion-button color="apppersonalized" (click)="createProductType()" expand="block" fill="clear" shape="round">
-            Create Product Type
+          <ion-button color="apppersonalized" (click)="editProductType()" expand="block" fill="clear" shape="round">
+            Edit Product Type
           </ion-button>
         </ion-chip>
       </ion-col>

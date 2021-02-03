@@ -1,0 +1,52 @@
+<ion-content class="backi my-modal">
+  <ion-card>
+
+    <ion-item color="lightapppersonalized ">
+
+      <ion-label slot="start">
+        <ion-text color="apppersonalized" >
+          <h2 style="font-weight: bold;"> Edit Selected Product</h2>
+        </ion-text>
+      </ion-label>
+      <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+
+    </ion-item>
+
+    <form [formGroup]="editProdForm" (ngSubmit)="editProd()" *ngIf="productSelected">
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">{{productSelected.product_name}}<ion-text color="danger">*
+          </ion-text>
+        </ion-label>
+        <ion-input [placeholder]="productSelected.product_name" [value]="productSelected.product_name" required formControlName="productName" type="text"></ion-input>
+      </ion-item>
+    
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Select Product Price </ion-label>
+        <ion-select placeholder="Price" formControlName="productPrice">
+          <ion-select-option required *ngFor="let item of pricesProduct; let i=index" ngDefaultControl
+            [value]="item.id_fee">${{item.price_per_day}}.00/per day </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item color="lightapppersonalized ">
+        <ion-label color="apppersonalized " position="floating">Select Product Fee </ion-label>
+        <ion-select placeholder="Fee" formControlName="productFeeDelay">
+          <ion-select-option required *ngFor="let item of feesProduct; let i=index" ngDefaultControl
+            [value]="item.id_fee">${{item.charge_per_day}}.00/per day</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="flex-ionic" color="lightapppersonalized ">
+        <ion-button color="apppersonalized " type="submit" [disabled]="editProdForm.invalid">
+          <ion-text style="color:white">
+            Create
+          </ion-text>
+        </ion-button>
+      </div>
+
+    </form>
+
+  </ion-card>
+</ion-content>

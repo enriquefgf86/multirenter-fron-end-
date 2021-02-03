@@ -1,3 +1,4 @@
+import { CreateProductTypeComponent } from "./create-product-type/create-product-type.component";
 import { CreateProductSubtypeComponent } from "./create-product-subtype/create-product-subtype.component";
 import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
@@ -9,7 +10,6 @@ import { CreateProductComponent } from "./create-product/create-product.componen
   styleUrls: ["./create-product-subtype-modal.component.scss"],
 })
 export class CreateProductSubtypeModalComponent implements OnInit {
-  
   constructor(public modalController: ModalController) {}
 
   ngOnInit() {}
@@ -32,7 +32,14 @@ export class CreateProductSubtypeModalComponent implements OnInit {
   }
   //abriendo modal de crear sub type de producto
 
-  createProductType() {}
+  async createProductType() {
+    const modal = await this.modalController.create({
+      component: CreateProductTypeComponent,
+      cssClass: "my-custom-class",
+    });
+    return await modal.present();
+  }
+  //abriendo modal de crear type de producto
 
   closeCreateProdModal() {
     return this.modalController.dismiss();

@@ -9,6 +9,7 @@ import {
   Data,
   DataAllImages,
   ListofProduct,
+  Product,
   StattusSuccessImges,
 } from "../interfaces/interfaces.interface";
 
@@ -19,6 +20,7 @@ export interface StateProducts {
   allImgSubType: AllImage[];
   allFeesProducts: AllFeeDeelay[];
   allPricesProducts: Allprice[];
+  productSelectedId:Product
 }
 export const initialState: StateProducts = {
   allProducts: null,
@@ -27,6 +29,7 @@ export const initialState: StateProducts = {
   allImgSubType: null,
   allFeesProducts: null,
   allPricesProducts: null,
+  productSelectedId:null
 };
 
 const _prodReducer = createReducer(
@@ -57,6 +60,11 @@ const _prodReducer = createReducer(
   on(prods.setAllProductDeelaysMount, (state, { allProdDeelays }) => ({
     ...state,
     allFeesProducts: { ...allProdDeelays },
+  })),
+
+  on(prods.setProductSelectedById, (state, { productById}) => ({
+    ...state,
+    productSelectedId: productById,
   }))
 );
 

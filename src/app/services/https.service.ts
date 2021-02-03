@@ -38,7 +38,7 @@ import { map } from "rxjs/operators";
 import { of as observableOf, Observable } from "rxjs";
 import { AngularFireStorage } from "@angular/fire/storage";
 //ionic core
-import { LoadingController } from "@ionic/angular";
+import { LoadingController, ToastController } from "@ionic/angular";
 
 const grantType = environment.congfigGrant;
 const grantType_RefreshToken = environment.configRefresh;
@@ -63,7 +63,8 @@ export class HttpsService {
     private stateStore: Store<GlobalAppState>,
     private decodingService: DecoderTokenService,
     private imgDownLoaderFirebase: AngularFireStorage,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private toastController: ToastController
   ) {}
   //////////////////////////////////////////login user///////////////////////////////////
   async loginUser(username: string, password: string) {
@@ -709,6 +710,14 @@ export class HttpsService {
 
   //////////////////////////////////////create prodSubtype//////////////////////////////////////
   async createProdSubType(productSubTypeName: string, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Creating Sub Type of Product, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
     const authorizationCredentials = await btoa(
       environment.configId + ":" + environment.configSecret
     );
@@ -759,6 +768,359 @@ export class HttpsService {
       .then((data) => {
         console.log(data);
         this.getAllProdSubTypes();
+
+        loading.dismiss();
+        // Estableciendo el fin del loader en el proceso;
       });
+  }
+
+  //////////////////////////////////////create prodtype//////////////////////////////////////
+  async createProdType(productTypeName: string, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Creating Type of Product, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+
+      // ;
+    });
+    //estableciendo los headers
+
+    const body = {
+      productTypeName: productTypeName,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    // console.log(this.tokenStoraged);
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    //parametros para el login en el body
+
+    const bodyFinal = JSON.stringify(body);
+    const finalBodyParams = bodyParams.toString();
+    //Convirtiendo a string el body raw y el body params para posteriormente
+    //pasarlo como objeto en el request
+
+    return this.http
+      .post<any>(
+        `${url}/product/create/product/type?${finalBodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllProdtypes();
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+      });
+  }
+
+  ////////////////////////////////////////////////////get product by id///////////
+  async editProductById(
+    productName: string,
+    productPrice,
+    productFeeDelay,
+    productId,
+    renterId
+  ) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Creating Type of Product, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+
+      // ;
+    });
+    //estableciendo los headers
+
+    const body = {
+      productName: productName,
+      productPrice: { id: productPrice },
+      productFeeDelay: { id: productFeeDelay },
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    // console.log(this.tokenStoraged);
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    bodyParams.set("productId", productId);
+    //parametros para el login en el body
+
+    const bodyFinal = JSON.stringify(body);
+    const finalBodyParams = bodyParams.toString();
+    //Convirtiendo a string el body raw y el body params para posteriormente
+    //pasarlo como objeto en el request
+
+    return this.http
+      .put<any>(
+        `${url}/product/product/edit/product?${finalBodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getProductById(productId);
+        this.getAllProducts()
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Product Edited correctly";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      });
+  }
+
+  ////////////////////////////////////////////////////get product by id///////////
+  async getProductById(productId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Getting the product ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Basic ${authorizationCredentials}`,
+    });
+    //estableciendo los headers
+
+    return this.http
+      .get<any>(
+        `${url}/product/product/id/${productId}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then(async (data) => {
+        console.log(data);
+
+        await this.stateStore.dispatch(
+          actionsProd.setProductSelectedById({ productById: data.data.product })
+        );
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+      });
+  }
+
+    //////////////////////////////////////get product subtype by id///////////
+    async editProductSubById(
+      productSubTypeName: string,
+      productSubTypeId,
+      renterId
+    ) {
+      const loading = await this.loadingController.create({
+        cssClass: "my-custom-class",
+        message: "Editing Sub Type Product, Please Wait ...",
+      });
+  
+      loading.present();
+      // Estableciendo loader en el proceso;
+  
+      const authorizationCredentials = await btoa(
+        environment.configId + ":" + environment.configSecret
+      );
+      //inicializando las variables de header
+  
+      let token: string = (await this.storageService.getTokenInStorage())
+        .access_token;
+      //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+      //apartado de Bearer
+  
+      const headers = new HttpHeaders({
+        "Content-Type": " application/json;charset=UTF-8;",
+        Authorization: `Bearer ${token}`,
+      });
+      //estableciendo los headers
+  
+      const body = {
+        productSubTypeName: productSubTypeName,
+      };
+      //Passing the raw body para luego proceder a su stringyfy
+  
+      const bodyParams = new URLSearchParams();
+  
+      bodyParams.set("renterId", renterId);
+      bodyParams.set("productSubTypeId", productSubTypeId);
+      //parametros para el login en el body
+  
+      const bodyFinal = JSON.stringify(body);
+      const finalBodyParams = bodyParams.toString();
+      //Convirtiendo a string el body raw y el body params para posteriormente
+      //pasarlo como objeto en el request
+  
+      return this.http
+        .put<any>(
+          `${url}/product/product/edit/product/subtype?${finalBodyParams}`,
+          //psando los parametros del url
+          //concatenados al url del endpoint
+          JSON.stringify(body),
+          //pasando ell body roaw medinate stringify
+          {
+            headers: headers,
+          }
+          //pasando los headers
+        )
+        .toPromise()
+        .then((data) => {
+          console.log(data);
+          this.getAllProdSubTypes();
+  
+          loading.dismiss();
+          // Estableciendo el fin del  loader en el proceso;
+  
+          let message = "Product Sub Type  Edited correctly";
+          this.presentToast(message);
+          //adicionando el toaster que indica el fin de la accion
+        });
+    }
+
+        //////////////////////////////////////get product Type by id///////////
+        async editProducTypeById(
+          productTypeName: string,
+          productTypeId,
+          renterId
+        ) {
+          const loading = await this.loadingController.create({
+            cssClass: "my-custom-class",
+            message: "Editing Type Product, Please Wait ...",
+          });
+      
+          loading.present();
+          // Estableciendo loader en el proceso;
+      
+          const authorizationCredentials = await btoa(
+            environment.configId + ":" + environment.configSecret
+          );
+          //inicializando las variables de header
+      
+          let token: string = (await this.storageService.getTokenInStorage())
+            .access_token;
+          //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+          //apartado de Bearer
+      
+          const headers = new HttpHeaders({
+            "Content-Type": " application/json;charset=UTF-8;",
+            Authorization: `Bearer ${token}`,
+          });
+          //estableciendo los headers
+      
+          const body = {
+            productTypeName: productTypeName,
+          };
+          //Passing the raw body para luego proceder a su stringyfy
+      
+          const bodyParams = new URLSearchParams();
+      
+          bodyParams.set("renterId", renterId);
+          bodyParams.set("productTypeId", productTypeId);
+          //parametros para el login en el body
+      
+          const bodyFinal = JSON.stringify(body);
+          const finalBodyParams = bodyParams.toString();
+          //Convirtiendo a string el body raw y el body params para posteriormente
+          //pasarlo como objeto en el request
+      
+          return this.http
+            .put<any>(
+              `${url}/product/product/edit/product/type?${finalBodyParams}`,
+              //psando los parametros del url
+              //concatenados al url del endpoint
+              JSON.stringify(body),
+              //pasando ell body roaw medinate stringify
+              {
+                headers: headers,
+              }
+              //pasando los headers
+            )
+            .toPromise()
+            .then((data) => {
+              console.log(data);
+              this.getAllProdtypes();
+      
+              loading.dismiss();
+              // Estableciendo el fin del  loader en el proceso;
+      
+              let message = "Product Type  Edited correctly";
+              this.presentToast(message);
+              //adicionando el toaster que indica el fin de la accion
+            });
+        }
+    
+
+  ////////////////////////////////////////notificador toast de fin de acciones///////
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 5000,
+    });
+    toast.present();
   }
 }

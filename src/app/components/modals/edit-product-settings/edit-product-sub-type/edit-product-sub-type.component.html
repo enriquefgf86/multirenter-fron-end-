@@ -1,0 +1,26 @@
+<ion-content class="backi my-modal">
+  <ion-card>
+    <ion-item color="lightapppersonalized ">
+
+      <ion-label slot="start">
+        <ion-text color="apppersonalized">
+          <h2 style="font-weight: bold;"> Edit Product Sub Type</h2>
+        </ion-text>
+      </ion-label>
+      <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+
+    </ion-item>
+
+    <ion-item #some (click)="editProdSub($event)"  *ngFor="let prod of allProductsSubTypes">
+     
+      <ion-label  (click)="editProdSub($event)">{{prod.productSubType}}</ion-label>
+      <ion-button [id]="prod.id"  slot="end" (click)="editProdSub($event)">
+        Edit
+      </ion-button>
+    </ion-item>
+    <!-- vease que del ngfor se bindea el id del elemento en cuestion dentro del ngfor [id]="prod.id"
+    poara posteriormente proceder a extraerlo del dom en un metodo oara su uso . -->
+
+  </ion-card>
+
+</ion-content>

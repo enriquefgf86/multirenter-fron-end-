@@ -91,6 +91,7 @@ export interface Data {
 }
 
 export interface ListofProduct {
+  id: string;
   product_comments: Productcomment[];
   product_rents: Productrent[];
   product_type: string;
@@ -185,4 +186,41 @@ export interface DataAllImages {
 export interface AllImage {
   id: number;
   url: string;
+}
+
+export interface RootObjectProduct {
+  status: string;
+  code: string;
+  message: string;
+  data: Data;
+}
+
+export interface RootProduct {
+  product: Product;
+}
+
+export interface Product {
+  product_comments: any[];
+  product_rents: ProductSelectedRent[];
+  product_type: string;
+  product_imgs: ProductSelectedimg[];
+  product_in_inventary: boolean;
+  id: number;
+  product_name_sub_type: string;
+  product_name: string;
+}
+
+export interface ProductSelectedimg {
+  id: number;
+  url: string;
+}
+
+export interface ProductSelectedRent {
+  rent_days: number;
+  rent_id: number;
+  rent_real_cost: number;
+  rent_closed: string;
+  rent_by: string;
+  rent_costs: number;
+  rent_real_days: number;
 }

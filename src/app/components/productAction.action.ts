@@ -8,12 +8,19 @@ import {
   Data,
   DataAllImages,
   ListofProduct,
+  Product,
   StattusSuccessImges,
 } from "../interfaces/interfaces.interface";
 
 export const setAllProducts = createAction(
   "[Products] setAllProducts",
   props<{ allProductsToSet: ListofProduct[] }>()
+);
+//creando la accion que setea los valores del array de productos traidos desde el back en el store
+
+export const setProductSelectedById = createAction(
+  "[Products] setProductSelectedById ",
+  props<{ productById:Product}>()
 );
 //creando la accion que setea los valores del array de productos traidos desde el back en el store
 
