@@ -11,10 +11,10 @@
 
     </ion-item>
 
-    <ion-item #some (click)="editProdSub($event)"  *ngFor="let prod of allProductsSubTypes">
+    <ion-item #some   *ngFor="let prod of allProductsSubTypes">
      
-      <ion-label  (click)="editProdSub($event)">{{prod.productSubType}}</ion-label>
-      <ion-button [id]="prod.id"  slot="end" (click)="editProdSub($event)">
+      <ion-label  >{{prod.productSubType}}</ion-label>
+      <ion-button [id]="prod.id"  slot="end" (click)="editProdSub($event)" color="lightapppersonalized ">
         Edit
       </ion-button>
     </ion-item>

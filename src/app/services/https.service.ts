@@ -1,3 +1,4 @@
+import { async } from "@angular/core/testing";
 import { userAuth } from "./../components/authAction.action";
 //services
 import { DecoderTokenService } from "./decoder-token.service";
@@ -7,8 +8,14 @@ import {
   Data,
   decodedToken,
   ListofProduct,
+  PaymentIntent,
+  PaymentIntentStripeResult,
+  renterRentRoot,
+  RootAllRenters,
   RootProdFee,
   RootProductPrice,
+  RootRenterRents,
+  RootRenterRentsById,
   RootResponse,
   SignUp,
   StattusSuccessImges,
@@ -31,11 +38,12 @@ import { Store } from "@ngrx/store";
 import { GlobalAppState } from "../globalReducer.reducer";
 import * as actionsAuth from "../components/authAction.action";
 import * as actionsProd from "../components/productAction.action";
+import * as actionsRenter from "../components/renterAction.action";
 //decoder jwt
 import jwt_decode from "jwt-decode";
 //rxjs
-import { map } from "rxjs/operators";
-import { of as observableOf, Observable } from "rxjs";
+import { catchError, map, tap } from "rxjs/operators";
+import { of as observableOf, Observable, of } from "rxjs";
 import { AngularFireStorage } from "@angular/fire/storage";
 //ionic core
 import { LoadingController, ToastController } from "@ionic/angular";
@@ -84,21 +92,21 @@ export class HttpsService {
 
     const headers = new HttpHeaders({
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + authorizationCredentials,
+      Authorization: `Basic ${authorizationCredentials}`,
     });
     //Estableciendo los headers(Authorizacion y ContentType(urlencoded))
     console.log(headers);
 
-    return this.http
-      .post<tokengenerated>(
-        `${url}/security/oauth/token`,
-        bodyParams.toString(),
-        {
-          headers: headers,
-        }
-      )
-      .toPromise() //suscribiendonos al metodo para una vez llamdado el endpoint proceder a log in el usuario
-      .then(async (data: tokengenerated) => {
+    return fetch(`${url}/security/oauth/token?${bodyParams}`, {
+      method: "POST", //metodo
+
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${authorizationCredentials}`,
+      }, //headers
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
         console.log(data);
         let auth: boolean = true;
         await this.storageService.setTokenInstorage(data);
@@ -136,13 +144,94 @@ export class HttpsService {
         //estableciendo el token decodificado en el store
 
         this.emittingAuthState();
+        //llamando el metodo que triggeriza una accion emitter cualesquiera que esta sea
+
+        let message = "User logged";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
 
         this.decodingService
           .imageRetrieverUser(decodedJson.renterImg)
           .then((data) => {
             console.log(data);
           });
+        //obteneindo la imagen del usuario autenticado , del serivico de decodingService
+      })
+      .catch((err) => {
+        if (err.status == 504) {
+          let message = "Delay late latency ,wait little more...";
+          this.presentToast(message);
+          this.loginUser(username, password);
+        }
+        if (err.status == 401) {
+          let message = "You don't have permission";
+          this.presentToast(message);
+        }
+        if (err.message == "Invalid token specified") {
+          let message =
+            "Could not sign up. Problem with token , get in touch with administraror";
+          this.presentToast(message);
+        }
+        console.log(err);
       });
+    //proceso del fetch que resume los readers y el call al endpoint con los headers
+    //y el token de autorizacion para el llamado al metodo haciendo una variante mas segura
+    //en vez de utilizar angular http methods
+
+    // return this.http
+    //   .post<tokengenerated>(
+    //     `${url}/security/oauth/token`,
+    //     bodyParams.toString(),
+    //     {
+    //       headers: headers,
+    //     }
+    //   )
+    //   .toPromise() //suscribiendonos al metodo para una vez llamdado el endpoint proceder a log in el usuario
+    //   .then(async (data: tokengenerated) => {
+    //     console.log(data);
+    //     let auth: boolean = true;
+    //     await this.storageService.setTokenInstorage(data);
+    //     //seteando el token en ele storage
+
+    //     this.storage.get("token").then((data: tokengenerated) => {
+    //       if (data == null || data == undefined) {
+    //         return;
+    //       }
+    //       this.tokenStoraged = data.access_token;
+    //     });
+    //     //obteniendo token del storage una vez
+
+    //     let decodedJson: decodedToken = await jwt_decode(data.access_token);
+    //     console.log(decodedJson);
+    //     //establecidno variable con decodificador de json para su uso
+
+    //     await this.storageService.setDecodedTokenInstorage(decodedJson);
+    //     //establecidnod el token decodificado  generado en el storage
+
+    //     await this.storageService.setUserAuthInstorage(auth);
+    //     //establecidnod el usuario autenticado en el storage
+
+    //     await this.stateStore.dispatch(actionsAuth.setToken({ token: data }));
+    //     //accediendo al global state de la aplicacion para el uso de los valores que
+    //     //en ella se almacenan , en este caso  se setea el token generado en la mismma
+    //     //a traves del el metodo inicializado en la accion  settoken , pasandosele como
+    //     //prop un objeto que contendria como value la data (token generado)
+
+    //     await this.stateStore.dispatch(
+    //       actionsAuth.decodingToken({ decoded: decodedJson })
+    //     );
+    //     //estableciendo el token decodificado en el store
+    //     await this.stateStore.dispatch(actionsAuth.userAuth());
+    //     //estableciendo el token decodificado en el store
+
+    //     this.emittingAuthState();
+
+    //     this.decodingService
+    //       .imageRetrieverUser(decodedJson.renterImg)
+    //       .then((data) => {
+    //         console.log(data);
+    //       });
+    //   });
     //proceso de Login del usuario en donde a la vez se setena valores en el store y en redux desde el servicio
   }
 
@@ -186,6 +275,11 @@ export class HttpsService {
 
   //////////////////////////////////////////log out user///////////////////////////////////
   async logOutUser() {
+    await this.storageService.cleanStorage();
+    await this.stateStore.dispatch(actionsAuth.resetStore()); //reseteando el store
+
+    this.getAllProducts();
+
     const authorizationCredentials1 = btoa(
       environment.configId + ":" + environment.configSecret
     );
@@ -205,93 +299,123 @@ export class HttpsService {
     })
       .then((res) => res.json())
       .then(async (data) => {
-        this.emittingAuthState();
+        // this.emittingAuthState();
 
         console.log(data); //log d ela data que se trae
         await this.storageService.cleanStorage(); //limpiando el storage
+
         await this.stateStore.dispatch(actionsAuth.resetStore()); //reseteando el store
+
+        await this.getAllProducts();
+
         this.router.navigate(["/tabs/tab6"]); //finalmente navegando a la pagina de signUp
+
+        let message = "User logged out";
+
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       })
 
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        let message =
+          "Problem in the loggin out , get in tpouch with administrator ";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
     //proceso del fetch que resume los readers y el call al endpoint con los headers
     //y el token de autorizacion para el llamado al metodo haciendo una variante mas segura
     //en vez de utilizar angular http methods
   }
 
   ///////////////////////////////renew token/////////////////////////////////////////////
-  renewToken(tokenInStorage: string) {
-    const authorizationCredentials = btoa(
-      environment.configId + ":" + environment.configSecret
-    );
-    const bodyParams = new URLSearchParams();
+  renewToken(): Observable<boolean> {
+    // tokenInStorage: string
 
-    bodyParams.set("grant_type", grantType_RefreshToken);
-    bodyParams.set(grantType_RefreshToken, tokenInStorage);
-    //parametros para el refreshtoken en el body
+    let tokenInSettledStorage: tokengenerated;
 
-    const headers = new HttpHeaders({
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + authorizationCredentials,
-    });
-    //Estableciendo los headers(Authorizacion y ContentType(urlencoded))
-    console.log(headers);
+    this.storageService.getTokenInStorage();
 
-    return this.http
-      .post<tokengenerated>(
-        `${url}/security/oauth/token`,
-        bodyParams.toString(),
-        {
-          headers: headers,
-        }
-      )
-      .toPromise() //suscribiendonos al metodo para una vez llamdado el endpoint proceder a log in el usuario
-      .then(async (data: tokengenerated) => {
-        console.log(data);
-        this.emittingAuthState();
+    if (this.storageService.tokenInStorage) {
+      tokenInSettledStorage = this.storageService.tokenInStorage;
 
-        let user: boolean = true;
-        //variable que define el user  status en la aplicacion
+      console.log(tokenInSettledStorage);
 
-        await this.storageService.setTokenInstorage(data);
-        //seteando el token en ele storage
+      const authorizationCredentials = btoa(
+        environment.configId + ":" + environment.configSecret
+      );
 
-        await this.storageService.setUserAuthInstorage(user);
-        //seteando el user en el storage
+      const bodyParams = new URLSearchParams();
 
-        this.storage.get("token").then((data: tokengenerated) => {
-          if (data == null || data == undefined) {
-            return;
-          }
-          this.tokenStoraged = data.access_token;
-        });
-        //obteniendo token del storage una vez
+      bodyParams.set("grant_type", grantType_RefreshToken);
+      // bodyParams.set(grantType_RefreshToken, tokenInStorage);
+      bodyParams.set(
+        grantType_RefreshToken,
+        tokenInSettledStorage.refresh_token
+      );
 
-        let decodedJson: decodedToken = await jwt_decode(data.access_token);
-        console.log(decodedJson);
-        //establecidno variable con decodificador de json para su uso
+      //parametros para el refreshtoken en el body
 
-        await this.storageService.setDecodedTokenInstorage(decodedJson);
-        //establecidnod el token decodificado  generado en el storage
-
-        await this.stateStore.dispatch(actionsAuth.setToken({ token: data }));
-        //accediendo al global state de la aplicacion para el uso de los valores que
-        //en ella se almacenan , en este caso  se setea el token generado en la mismma
-        //a traves del el metodo inicializado en la accion  settoken , pasandosele como
-        //prop un objeto que contendria como value la data (token generado)
-
-        await this.stateStore.dispatch(
-          actionsAuth.decodingToken({ decoded: decodedJson })
-        );
-        //estableciendo el token decodificado en el store
-
-        console.log("token renewed : " + data);
-
-        this.decodingService.imageRetrieverUser(decodedJson.renterImg).then();
-      })
-      .catch((err) => {
-        console.log(err);
+      const headers = new HttpHeaders({
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Basic " + authorizationCredentials,
       });
+      //Estableciendo los headers(Authorizacion y ContentType(urlencoded))
+      console.log(headers);
+
+      return this.http
+        .post<tokengenerated>(
+          `${url}/security/oauth/token`,
+          bodyParams.toString(),
+          {
+            headers: headers,
+          }
+        )
+        .pipe(
+          tap(async (response: tokengenerated) => {
+            await this.storageService.setTokenInstorage(response);
+            //seteando el token en ele storage
+
+            let user: boolean = true;
+            //variable que define el user  status en la aplicacion
+
+            await this.storageService.setUserAuthInstorage(user);
+            //seteando el user en el storage
+
+            let decodedJson: decodedToken = await jwt_decode(
+              response.access_token
+            );
+            console.log(decodedJson);
+            //establecidno variable con decodificador de json para su uso
+
+            await this.storageService.setDecodedTokenInstorage(decodedJson);
+            //establecidnod el token decodificado  generado en el storage
+
+            await this.stateStore.dispatch(
+              actionsAuth.setToken({ token: response })
+            );
+            //accediendo al global state de la aplicacion para el uso de los valores que
+            //en ella se almacenan , en este caso  se setea el token generado en la mismma
+            //a traves del el metodo inicializado en la accion  settoken , pasandosele como
+            //prop un objeto que contendria como value la response (token generado)
+
+            await this.stateStore.dispatch(
+              actionsAuth.decodingToken({ decoded: decodedJson })
+            );
+            //estableciendo el token decodificado en el store
+
+            console.log("token renewed : " + response);
+
+            let message = "User with tooken renewed";
+            this.presentToast(message);
+            // presentando taster con la finalizacion de la accion
+
+            this.decodingService.imageRetrieverUser(decodedJson.renterImg);
+          }),
+          map((response) => true),
+          catchError((err) => observableOf(false))
+        );
+    } else return;
   }
 
   ///////////////////////////////////user is authenticated funcion //////////////////
@@ -364,10 +488,137 @@ export class HttpsService {
       .catch((err) => {
         console.log(err);
         loading.dismiss();
+        if (err.status == 504) {
+          let message = "Delay late latency ,wait little more...";
+          this.presentToast(message);
+          this.getAllProducts();
+        }
         //seteando el loader off
       });
     //vease que despues de resuleta la promesa se procede a obtener lo traido desde el endpoint
     //y se procede a extraer su data del tipo de INterfacedata, para posteriormente mediante
+    //una accion del reducer , proceder a plasmar toda esa informacion
+  }
+
+  ///////////////////////////////////get all products //////////////////
+  async getAllRenters() {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Getting All Products, Please Wait ...",
+    });
+    //Loader para creacion del usuario propio de ionic
+
+    loading.present();
+    //seteando el loader
+    const authorizationCredentials = btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //variables contenedora de los headers
+
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+      Authorization: "Basic " + authorizationCredentials,
+    });
+    //Estableciendo los headers(Authorizacion y ContentType(urlencoded))
+    return this.http
+      .get<RootAllRenters>(
+        `${url}/renter/all/renters`,
+
+        {
+          headers: headers,
+        }
+      ) //pasando el call al endpoint con los headers
+      .toPromise()
+      .then(async (data: RootAllRenters) => {
+        data;
+
+        console.log(data);
+
+        loading.dismiss();
+        //seteando el loader off
+
+        this.stateStore.dispatch(
+          actionsRenter.setAllRenters({ allRenters: data.data.all_renters })
+        );
+
+        let message = "All renters obtained";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        loading.dismiss();
+        if (err.status == 504) {
+          let message = "Delay late latency ,wait little more...";
+          this.presentToast(message);
+          this.getAllRenters();
+        }
+        //seteando el loader off
+      });
+    //vease que despues de resuleta la promesa se procede a obtener lo traido desde el endpoint
+    //y se procede a extraer su data del tipo de AllRenter, para posteriormente mediante
+    //una accion del reducer , proceder a plasmar toda esa informacion
+  }
+
+  ///////////////////////////////////delete user //////////////////
+  async deleteUser(adminId, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Disabling Renter, Please Wait ...",
+    });
+    //Loader para creacion del usuario propio de ionic
+
+    loading.present();
+    //seteando el loader
+    const authorizationCredentials = btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //variables contenedora de los headers
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    const bodyParams = new URLSearchParams();
+    bodyParams.set("renterDeleter", adminId);
+    //estableciendo el body params que traeria el usuario  con autorizacion
+    //para eliminar
+
+    return fetch(`${url}/renter/renter/delete/id/${renterId}?${bodyParams}`, {
+      method: "PUT", //metodo
+
+      headers: {
+        "Content-type":
+          "application/json; charset=UTF-8;application/x-www-form-urlencoded",
+        Authorization: `Bearer  ${token}`,
+      }, //headers pasados en elmetodo incluyendo el token de autorizacion
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
+        loading.dismiss();
+        //seteando el loader off
+
+        this.stateStore.dispatch(
+          actionsRenter.setAllRenters({ allRenters: data.data.all_renters })
+        );
+        //estableciendo los renters en el redux con la nueva modificacion
+      })
+
+      .catch((err) => {
+        loading.dismiss();
+        //seteando el loader off
+        console.log(err);
+      });
+
+    //vease que despues de resuleta la promesa se procede a obtener lo traido desde el endpoint
+    //y se procede a extraer su data del tipo de AllRenter, para posteriormente mediante
     //una accion del reducer , proceder a plasmar toda esa informacion
   }
 
@@ -453,11 +704,19 @@ export class HttpsService {
   }
 
   //////////////////////////////////get all images sub  types////////////////////////////////////
-  getAllimgSubTypes() {
+  async getAllimgSubTypes() {
     const authorizationCredentials = btoa(
       environment.configId + ":" + environment.configSecret
     );
     //inicializando las variables de header
+
+    // const loading = await this.loadingController.create({
+    //   cssClass: "my-custom-class",
+    //   message: "Getting All Images...",
+    // });
+
+    // loading.present();
+    // // Estableciendo loader en el proceso;
     const headers = new HttpHeaders({
       "Content-Type": "application/json",
       Authorization: "Basic " + authorizationCredentials,
@@ -474,7 +733,7 @@ export class HttpsService {
       ) //endpont de llamda
       .toPromise() //resolviendo la promesa a para posteriormente proceder a ejecutar ciertas tareas
       .then(async (data) => {
-        // console.log(data);
+        console.log(data);
 
         // let arrayOfImgSubTypes = await Object.keys(data.data.allImages).map(
         //   (result) => {
@@ -515,11 +774,16 @@ export class HttpsService {
         );
         //despelegando a redux las imagens traidas en el request
 
+        // loading.dismiss();
+        // // Estableciendo el fin del  loader en el proceso;
+
         this.storageService.setAllImgSubTypesInStorage(data.data.allImages);
         //Poniendo en el storage las images traidas
       })
       .catch((err) => {
         console.log(err);
+        // loading.dismiss();
+        // // Estableciendo el fin del  loader en el proceso;
       });
     //pasando el call al endpoint con los headers
   }
@@ -577,6 +841,17 @@ export class HttpsService {
       .then((data) => {
         console.log(data);
         this.getAllimgSubTypes();
+
+        let message = "Image Created";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message =
+          "Some error happened , please get in touch with adminstrator";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
   }
 
@@ -639,7 +914,18 @@ export class HttpsService {
       .then((data) => {
         console.log(data);
         this.getAllProducts();
-      });
+        let message = "Product Created";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch(
+        (err) => {
+          console.log(err);
+          let message = "Something went wrong , get in touch with admin ";
+          this.presentToast(message);
+        }
+        // presentando taster con la finalizacion de la accion
+      );
   }
 
   ///////////////////////////////////////get all products prices////////////////////////////////
@@ -671,6 +957,10 @@ export class HttpsService {
       })
       .catch((err) => {
         console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
     //imprimiendo error en caso de fallo
   }
@@ -704,6 +994,10 @@ export class HttpsService {
       })
       .catch((err) => {
         console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
     //imprimiendo error en caso de fallo
   }
@@ -771,6 +1065,160 @@ export class HttpsService {
 
         loading.dismiss();
         // Estableciendo el fin del loader en el proceso;
+
+        let message1 = "Product Sub Type Created";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////add comment on product//////////////////////////////////////
+  async addCommentInProduct(
+    comment: string,
+    productId: number,
+    renterId: number
+  ) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Adding Comment, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+
+      // ;
+    });
+    //estableciendo los headers
+
+    const body = {
+      commentBody: comment,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    return this.http
+      .post<any>(
+        `${url}/product/product/id/${productId}/renter/id/${renterId}/add/comment`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllProducts();
+
+        loading.dismiss();
+        // Estableciendo el fin del loader en el proceso;
+      })
+      .catch((err) => {
+        console.log(err);
+        loading.dismiss();
+        // Estableciendo el fin del loader en el proceso;
+
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////create rent//////////////////////////////////////
+  async rentingProduct(rentDays: number, productId, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Making the operation, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+
+      // ;
+    });
+    //estableciendo los headers
+
+    const body = {
+      rentDays: rentDays,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    //parametros para el login en el body
+
+    return this.http
+      .post<any>(
+        `${url}/rent/rents/rent/${productId}/product?${bodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllProducts();
+
+        loading.dismiss();
+        // Estableciendo el fin del loader en el proceso;
+
+        let message1 = "Product Rented";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        loading.dismiss();
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
   }
 
@@ -837,6 +1285,18 @@ export class HttpsService {
 
         loading.dismiss();
         // Estableciendo el fin del  loader en el proceso;
+
+        let message1 = "Producttype Created";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
   }
 
@@ -909,7 +1369,7 @@ export class HttpsService {
       .then((data) => {
         console.log(data);
         this.getProductById(productId);
-        this.getAllProducts()
+        this.getAllProducts();
 
         loading.dismiss();
         // Estableciendo el fin del  loader en el proceso;
@@ -917,6 +1377,13 @@ export class HttpsService {
         let message = "Product Edited correctly";
         this.presentToast(message);
         //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
   }
 
@@ -967,160 +1434,597 @@ export class HttpsService {
 
         loading.dismiss();
         // Estableciendo el fin del  loader en el proceso;
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
       });
   }
 
-    //////////////////////////////////////get product subtype by id///////////
-    async editProductSubById(
-      productSubTypeName: string,
-      productSubTypeId,
-      renterId
-    ) {
-      const loading = await this.loadingController.create({
-        cssClass: "my-custom-class",
-        message: "Editing Sub Type Product, Please Wait ...",
-      });
-  
-      loading.present();
-      // Estableciendo loader en el proceso;
-  
-      const authorizationCredentials = await btoa(
-        environment.configId + ":" + environment.configSecret
-      );
-      //inicializando las variables de header
-  
-      let token: string = (await this.storageService.getTokenInStorage())
-        .access_token;
-      //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
-      //apartado de Bearer
-  
-      const headers = new HttpHeaders({
-        "Content-Type": " application/json;charset=UTF-8;",
-        Authorization: `Bearer ${token}`,
-      });
-      //estableciendo los headers
-  
-      const body = {
-        productSubTypeName: productSubTypeName,
-      };
-      //Passing the raw body para luego proceder a su stringyfy
-  
-      const bodyParams = new URLSearchParams();
-  
-      bodyParams.set("renterId", renterId);
-      bodyParams.set("productSubTypeId", productSubTypeId);
-      //parametros para el login en el body
-  
-      const bodyFinal = JSON.stringify(body);
-      const finalBodyParams = bodyParams.toString();
-      //Convirtiendo a string el body raw y el body params para posteriormente
-      //pasarlo como objeto en el request
-  
-      return this.http
-        .put<any>(
-          `${url}/product/product/edit/product/subtype?${finalBodyParams}`,
-          //psando los parametros del url
-          //concatenados al url del endpoint
-          JSON.stringify(body),
-          //pasando ell body roaw medinate stringify
-          {
-            headers: headers,
-          }
-          //pasando los headers
-        )
-        .toPromise()
-        .then((data) => {
-          console.log(data);
-          this.getAllProdSubTypes();
-  
-          loading.dismiss();
-          // Estableciendo el fin del  loader en el proceso;
-  
-          let message = "Product Sub Type  Edited correctly";
-          this.presentToast(message);
-          //adicionando el toaster que indica el fin de la accion
-        });
-    }
+  //////////////////////////////////////get product subtype by id///////////
+  async editProductSubById(
+    productSubTypeName: string,
+    productSubTypeId,
+    renterId
+  ) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Editing Sub Type Product, Please Wait ...",
+    });
 
-        //////////////////////////////////////get product Type by id///////////
-        async editProducTypeById(
-          productTypeName: string,
-          productTypeId,
-          renterId
-        ) {
-          const loading = await this.loadingController.create({
-            cssClass: "my-custom-class",
-            message: "Editing Type Product, Please Wait ...",
-          });
-      
-          loading.present();
-          // Estableciendo loader en el proceso;
-      
-          const authorizationCredentials = await btoa(
-            environment.configId + ":" + environment.configSecret
-          );
-          //inicializando las variables de header
-      
-          let token: string = (await this.storageService.getTokenInStorage())
-            .access_token;
-          //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
-          //apartado de Bearer
-      
-          const headers = new HttpHeaders({
-            "Content-Type": " application/json;charset=UTF-8;",
-            Authorization: `Bearer ${token}`,
-          });
-          //estableciendo los headers
-      
-          const body = {
-            productTypeName: productTypeName,
-          };
-          //Passing the raw body para luego proceder a su stringyfy
-      
-          const bodyParams = new URLSearchParams();
-      
-          bodyParams.set("renterId", renterId);
-          bodyParams.set("productTypeId", productTypeId);
-          //parametros para el login en el body
-      
-          const bodyFinal = JSON.stringify(body);
-          const finalBodyParams = bodyParams.toString();
-          //Convirtiendo a string el body raw y el body params para posteriormente
-          //pasarlo como objeto en el request
-      
-          return this.http
-            .put<any>(
-              `${url}/product/product/edit/product/type?${finalBodyParams}`,
-              //psando los parametros del url
-              //concatenados al url del endpoint
-              JSON.stringify(body),
-              //pasando ell body roaw medinate stringify
-              {
-                headers: headers,
-              }
-              //pasando los headers
-            )
-            .toPromise()
-            .then((data) => {
-              console.log(data);
-              this.getAllProdtypes();
-      
-              loading.dismiss();
-              // Estableciendo el fin del  loader en el proceso;
-      
-              let message = "Product Type  Edited correctly";
-              this.presentToast(message);
-              //adicionando el toaster que indica el fin de la accion
-            });
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    const body = {
+      productSubTypeName: productSubTypeName,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    bodyParams.set("productSubTypeId", productSubTypeId);
+    //parametros para el login en el body
+
+    const bodyFinal = JSON.stringify(body);
+    const finalBodyParams = bodyParams.toString();
+    //Convirtiendo a string el body raw y el body params para posteriormente
+    //pasarlo como objeto en el request
+
+    return this.http
+      .put<any>(
+        `${url}/product/product/edit/product/subtype?${finalBodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
         }
-    
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllProdSubTypes();
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Product Sub Type  Edited correctly";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////get product Type by id///////////
+  async editImageSubTypeById(
+    imgUrl: string,
+    imgSubTypeId,
+    productSubTypeId,
+    renterId
+  ) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Editing image, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    const body = {
+      url: imgUrl,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    bodyParams.set("productSubTypeId", productSubTypeId);
+    bodyParams.set("imgSubTypeId", imgSubTypeId);
+
+    //parametros para el login en el body
+
+    const bodyFinal = JSON.stringify(body);
+    const finalBodyParams = bodyParams.toString();
+    //Convirtiendo a string el body raw y el body params para posteriormente
+    //pasarlo como objeto en el request
+
+    return this.http
+      .put<any>(
+        `${url}/product/product/edit/product/img/subtype?${finalBodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllimgSubTypes();
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Image Edited correctly";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////get product Type by id///////////
+  async editProducTypeById(productTypeName: string, productTypeId, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Editing Type Product, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    const body = {
+      productTypeName: productTypeName,
+    };
+    //Passing the raw body para luego proceder a su stringyfy
+
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    bodyParams.set("productTypeId", productTypeId);
+    //parametros para el login en el body
+
+    const bodyFinal = JSON.stringify(body);
+    const finalBodyParams = bodyParams.toString();
+    //Convirtiendo a string el body raw y el body params para posteriormente
+    //pasarlo como objeto en el request
+
+    return this.http
+      .put<any>(
+        `${url}/product/product/edit/product/type?${finalBodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+        JSON.stringify(body),
+        //pasando ell body roaw medinate stringify
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.getAllProdtypes();
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Product Type  Edited correctly";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////get renter by id///////////
+  async findRenterById(renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Getting renter Data, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    return this.http
+      .get<any>(
+        `${url}/renter/renter/id/${renterId}/all/rents`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data) => {
+        console.log(data);
+        this.stateStore.dispatch(
+          actionsRenter.setARenters({ aRenter: data.data })
+        );
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Data Ready";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        loading.dismiss();
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  //////////////////////////////////////get rent by id///////////
+  async findRentById(rentId, renterId) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Getting rent Data, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const headers = new HttpHeaders({
+      "Content-Type": " application/json;charset=UTF-8;",
+      Authorization: `Bearer ${token}`,
+    });
+    //estableciendo los headers
+
+    const bodyParams = new URLSearchParams();
+
+    bodyParams.set("renterId", renterId);
+    //parametros para el login en el body
+
+    return this.http
+      .get<any>(
+        `${url}/rent/rent/${rentId}?${bodyParams}`,
+        //psando los parametros del url
+        //concatenados al url del endpoint
+
+        {
+          headers: headers,
+        }
+        //pasando los headers
+      )
+      .toPromise()
+      .then((data: RootRenterRentsById) => {
+        console.log(data.data.rent_selected);
+        if (data.data.rent_selected) {
+          this.stateStore.dispatch(
+            actionsRenter.setARentById({ aRentId: data.data })
+          );
+          this.getProductById(data.data.rent_selected.rent_product_by_id);
+        }
+
+        loading.dismiss();
+        // Estableciendo el fin del  loader en el proceso;
+
+        let message = "Data Ready";
+        this.presentToast(message);
+        //adicionando el toaster que indica el fin de la accion
+      })
+      .catch((err) => {
+        loading.dismiss();
+        console.log(err);
+        let message1 = "Ok";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  ////////////////////////////////////////devolution of rent by id /////////
+  async devolutionrentByid(
+    rentRealDays,
+    rentId: number,
+    productId: number,
+    renterId
+  ) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Finalizing Operation, Please Wait ...",
+    });
+    //Loader para creacion del usuario propio de ionic
+
+    loading.present();
+    //seteando el loader
+    const authorizationCredentials = btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //variables contenedora de los headers
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    // const headers = new HttpHeaders({
+    //   "Content-Type": " application/json;charset=UTF-8;",
+    //   Authorization: `Bearer ${token}`,
+    // });
+    // //estableciendo los headers
+
+    const body = { rentRealDays: rentRealDays };
+    //estableciendo el body  los dias reales de renta
+    //para eliminar
+
+    const bodyParams = new URLSearchParams();
+    bodyParams.set("renterId", renterId);
+    //estableciendo el body params que traeria el usuario  con autorizacion
+    //para devolver
+
+    return fetch(
+      `${url}/rent/rents/rent/${productId}/${rentId}/devolution?${bodyParams}`,
+      {
+        method: "PUT", //metodo
+        body: JSON.stringify(body),
+        headers: {
+          "Content-type":
+            "application/json; charset=UTF-8;application/x-www-form-urlencoded",
+          Authorization: `Bearer  ${token}`,
+        }, //headers pasados en elmetodo incluyendo el token de autorizacion
+      }
+    )
+      .then((res) => res.json())
+      .then(async (data) => {
+        console.log(data);
+
+        this.getAllProducts();
+        //llamando todos los prodcutos de nuevo actualizados
+        loading.dismiss();
+        //seteando el loader off
+
+        let message1 = "Devolution done";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+
+      .catch((err) => {
+        loading.dismiss();
+        //seteando el loader off
+        console.log(err);
+        let message1 = "Devolution done";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+  //vease que despues de resuelta la promesa se procede a obtener lo traido desde el endpoint
+  //y se procede a extraer su data del tipo de AllRenter, para posteriormente mediante
+  //una accion del reducer , proceder a plasmar toda esa informacion
 
   ////////////////////////////////////////notificador toast de fin de acciones///////
   async presentToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
-      duration: 5000,
+      duration: 2000,
     });
     toast.present();
+  }
+
+  /////////////////////////error 504 retrier/////////////////
+  retrier(method) {
+    return method;
+  }
+
+  ///////////////////////////payment stripe method////////////////////////
+  async paymentIntentFunction(renterName:string,renterEmail:string,description: string, amount) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Connecting for payment, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const body = {  amount: amount*100,description: description };
+    body.toString();
+    //este body hace referencia al payment object inicializado en el objeto
+
+    return fetch(`${url}/rent/rents/rent/payment/stripe/intent`, {
+      method: "POST", //metodo
+      body: JSON.stringify(body),
+      headers: {
+        "Content-type":
+          "application/json",
+        Authorization: `Bearer  ${token}`,
+      }, //headers pasados en elmetodo incluyendo el token de autorizacion
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
+        console.log(data);
+       let dataResultIntent:PaymentIntentStripeResult=await  JSON.parse( data.data)
+
+       this.paymentConfirmStripeFunction(dataResultIntent.id,renterName,renterEmail)
+
+
+
+        this.getAllProducts();
+        //llamando todos los prodcutos de nuevo actualizados
+       
+        loading.dismiss();
+        //seteando el loader off
+
+        let message1 = "Rent paid ";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+
+      .catch((err) => {
+        loading.dismiss();
+        //seteando el loader off
+        console.log(err);
+        let message1 = "Rent paid ";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
+  }
+
+  ///////////////////////////payment confirm stripe method////////////////////////
+  async paymentConfirmStripeFunction(paymentIdCode: string,currentName: string,mailReceiver:string) {
+    const loading = await this.loadingController.create({
+      cssClass: "my-custom-class",
+      message: "Confirming for payment, Please Wait ...",
+    });
+
+    loading.present();
+    // Estableciendo loader en el proceso;
+
+    const authorizationCredentials = await btoa(
+      environment.configId + ":" + environment.configSecret
+    );
+    //inicializando las variables de header
+
+    let token: string = (await this.storageService.getTokenInStorage())
+      .access_token;
+    //accediendo  al token del storage para asignarlo a l valor  del authorization  en el
+    //apartado de Bearer
+
+    const body = {  paymentIdCode: paymentIdCode,currentName: currentName,mailReceiver:mailReceiver };
+    body.toString();
+    //este body hace referencia al payment object inicializado en el objeto
+
+    return fetch(`${url}/rent/rents/rent/payment/stripe/confirm`, {
+      method: "POST", //metodo
+      body: JSON.stringify(body),
+      headers: {
+        "Content-type":
+          "application/json",
+        Authorization: `Bearer  ${token}`,
+      }, //headers pasados en elmetodo incluyendo el token de autorizacion
+    })
+      .then((res) => res.json())
+      .then(async (data) => {
+        console.log(data);
+       console.log( JSON.parse( data.data))
+
+       
+        loading.dismiss();
+        //seteando el loader off
+
+        let message1 = "Payment Confirmed ";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message1);
+        // presentando taster con la finalizacion de la accion
+      })
+
+      .catch((err) => {
+        loading.dismiss();
+        //seteando el loader off
+        console.log(err);
+        let message1 = "Rent paid ";
+        let message = "Something went wrong , get in touch with admin";
+        this.presentToast(message);
+        // presentando taster con la finalizacion de la accion
+      });
   }
 }

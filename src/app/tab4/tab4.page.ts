@@ -1,3 +1,4 @@
+import { DeleteUserSettingsComponent } from "./../components/modals/delete-user-settings/delete-user-settings.component";
 import { CreateImageModalComponent } from "../components/modals/create-image-modal/create-image-modal.component";
 import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl } from "@angular/forms"; //imports
@@ -5,6 +6,7 @@ import { FormGroup, FormControl } from "@angular/forms"; //imports
 import { ModalController } from "@ionic/angular";
 import { CreateProductSubtypeModalComponent } from "../components/modals/create-product-subtype-modal/create-product-subtype-modal.component";
 import { EditProductSettingsComponent } from "../components/modals/edit-product-settings/edit-product-settings.component";
+import { EditImageSettingsComponent } from "../components/modals/edit-image-settings/edit-image-settings.component";
 
 @Component({
   selector: "app-tab4",
@@ -16,7 +18,7 @@ export class Tab4Page implements OnInit {
 
   ngOnInit() {}
 
-  async editImage() {
+  async createImage() {
     const modal = await this.modalController.create({
       component: CreateImageModalComponent,
       cssClass: "my-custom-class",
@@ -43,4 +45,22 @@ export class Tab4Page implements OnInit {
     return await modal.present();
   }
   //abriendo el modal que da paso a los menus de edicion de producto
+
+  async editImage() {
+    const modal = await this.modalController.create({
+      component: EditImageSettingsComponent,
+      cssClass: "my-custom-class",
+    });
+    return await modal.present();
+  }
+  //abriendo el modal que da paso a los menus de edicion  de imagenes de subtipos
+  //de productos
+
+  async editRenters() {
+    const modal = await this.modalController.create({
+      component: DeleteUserSettingsComponent,
+      cssClass: "my-custom-class",
+    });
+    return await modal.present();
+  }
 }

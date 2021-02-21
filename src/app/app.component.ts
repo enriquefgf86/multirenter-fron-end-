@@ -37,6 +37,10 @@ export class AppComponent implements OnInit {
   }
   async ngOnInit() {
     this.stateFetcher();
+    this.stateStore.select('authReducers').subscribe(data=>{
+      console.log(data.dedToken);
+      
+    })
   }
 
   initializeApp() {
@@ -57,7 +61,6 @@ export class AppComponent implements OnInit {
 
   async logOut() {
     let token = await this.token;
-    await console.log(token);
     await this.httpServices.logOutUser().then(() => {
       this.closeFirst();
     });
@@ -70,6 +73,7 @@ export class AppComponent implements OnInit {
       //redux por un valor para que no se de null
      
       if (data.dedToken) {
+        
         authoritiesOfUser = data.dedToken.authorities;
       }
       //establecindose una condicion que demarca que se cogeria el valore que

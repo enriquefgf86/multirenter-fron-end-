@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
     // acceddiendose al valor almacenado en storage referente al token
 
     this.stateStore.select("authReducers").subscribe((data) => {
-      console.log(data);
+      //console.log(data);
     });
     //accediendo a los valores del redux
 
@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit {
       })
       .catch((error) => {
         loading.dismiss();
-        console.log(error);
+        //console.log(error);
       });
   }
   //accion de login de usuario pasandosele los datos del reactive form y accediendo al servicio

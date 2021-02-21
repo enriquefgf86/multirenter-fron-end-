@@ -11,12 +11,12 @@
 
     </ion-item>
 
-    <ion-item #some (click)="editProd($event)"  *ngFor="let prod of allProducts">
-      <ion-avatar slot="start" >
+    <ion-item #some  *ngFor="let prod of allProducts">
+      <ion-avatar slot="start">
         <img [src]='(prod.product_imgs[0].url | pipeImagen|async)' />
       </ion-avatar>
-      <ion-label  (click)="editProd($event)">{{prod.product_name}}</ion-label>
-      <ion-button [id]="prod.id"  slot="end" (click)="editProd($event)">
+      <ion-label >{{prod.product_name}}</ion-label>
+      <ion-button [id]="prod.id" slot="end" (click)="editProd($event)" color="lightapppersonalized ">
         Edit
       </ion-button>
     </ion-item>

@@ -1,3 +1,4 @@
+import { ProductSubtypeSelectedComponent } from "./edit-product-sub-type/product-subtype-selected/product-subtype-selected.component";
 import { EditProductTypeComponent } from "./edit-product-type/edit-product-type.component";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -8,6 +9,7 @@ import { EditProductSubTypeComponent } from "./edit-product-sub-type/edit-produc
 import { EditProductComponent } from "./edit-product/edit-product.component";
 import { EditProductSettingsComponent } from "./edit-product-settings.component";
 import { EditProductTypeSelectedComponent } from "./edit-product-type/edit-product-type-selected/edit-product-type-selected.component";
+import { ProductSelectedComponent } from "./edit-product/product-selected/product-selected.component";
 
 @NgModule({
   declarations: [
@@ -15,8 +17,9 @@ import { EditProductTypeSelectedComponent } from "./edit-product-type/edit-produ
     EditProductTypeComponent,
     EditProductSubTypeComponent,
     EditProductTypeSelectedComponent,
-    EditProductSettingsComponent
-  
+    EditProductSettingsComponent,
+    ProductSubtypeSelectedComponent,
+    ProductSelectedComponent,
   ],
   imports: [
     CommonModule,

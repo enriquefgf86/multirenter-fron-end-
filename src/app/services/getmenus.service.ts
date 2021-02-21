@@ -40,6 +40,12 @@ export class GetmenusService {
       title: "Register",
       url: "/tabs/tab7",
     },
+    
+    // {
+    //   src: "../../assets/logout.svg",
+    //   title: "Log Out",
+    // },
+   
   ];
 
   constructor(
@@ -65,6 +71,8 @@ export class GetmenusService {
         );
       });
     }
+    //filtro que establece que si no hay usario registrado no se muestran 
+    //los items de dashboard para user y usuario 
 
     if (
       userAuth == true ||
@@ -78,6 +86,9 @@ export class GetmenusService {
         );
       });
     }
+    //filtro que establece que si no hay usario registrado no se muestran 
+    //los items de dashboard para user y usuario , o que si esta autenticado 
+    //pero por algun motivo en sus  roles dice NO_RENTER
 
     if (userAuth == true && authorities[0] == "ROLE_RENTER") {
       arrayComponents = this.components.filter((components) => {
@@ -88,8 +99,11 @@ export class GetmenusService {
         );
       });
     }
+    //Mostrando los items autorizados segun el usuario rentado con su role , en este caso 
+    //teniendo el role de ROLE_RENTER
 
     if (userAuth == true && authorities[0] == "ROLE_ADMIN") {
+
       arrayComponents = this.components.filter((components) => {
         return (
           components.title != "My Dashboard" &&
@@ -97,6 +111,9 @@ export class GetmenusService {
           components.title != "Register"
         );
       });
+     //Mostrando los items autorizados segun el usuario rentado con su role , en este caso 
+    //teniendo el role de ROLE_ADMIN
+
     }
     return arrayComponents;
   }

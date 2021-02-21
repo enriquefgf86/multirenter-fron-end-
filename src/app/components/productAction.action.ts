@@ -20,38 +20,35 @@ export const setAllProducts = createAction(
 
 export const setProductSelectedById = createAction(
   "[Products] setProductSelectedById ",
-  props<{ productById:Product}>()
+  props<{ productById: Product }>()
 );
-//creando la accion que setea los valores del array de productos traidos desde el back en el store
-
+//creando la accion que traeria el producto segun su id
 export const setAllProductsType = createAction(
   "[Products] setAllProductsType ",
   props<{ allProductsTypeToSet: AllProductsType[] }>()
 );
-//creando la accion que setea los valores del array de productos traidos desde el back en el store
+//accion que traeria todos los tipos de productos
 
 export const setAllProductsSubType = createAction(
   "[Products] setAllProductsSubType ",
   props<{ allProductsSubTypeToSet: AllProductsSubType[] }>()
 );
-//creando la accion que setea los valores del array de productos traidos desde el back en el store
+//accion que traeria todos los sub tipos de productos
 
 export const setAllImgSubType = createAction(
   "[Products] setAllImgSubType ",
   props<{ allImages: AllImage[] }>()
 );
-//creando la accion que setea los valores del array de productos traidos desde el back en el store
+//accion que traeria las imagenes de  todos los sub tipos de productos
 
 export const setAllProductDeelaysMount = createAction(
   "[Products] setAllProductDeelaysMount ",
   props<{ allProdDeelays: AllFeeDeelay[] }>()
 );
-//creando la accion que setea los valores del array de cargos [por delay en renta de productos traidos desde
-//el backend
+//accion que establece todos los fee delays de cada producto
 
 export const setAllProductPrices = createAction(
   "[Products] setAllProductPrices",
   props<{ allProdPrices: Allprice[] }>()
 );
-//creando la accion que setea los valores del array de precios  en renta de productos traidos desde
-//el backend
+//accion que trae todos los precios de todos los productos

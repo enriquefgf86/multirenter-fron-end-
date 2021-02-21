@@ -2,15 +2,40 @@
   <ion-row>
     <ion-col size-xs="12" size-md='6' size-lg='4' size-xl='3' size-sm='12'
       *ngFor="let prod of allProducts; let i=index">
-      <ion-card color='lightapppersonalized'>
+      <ion-card >
         <ion-card-header>
-          <ion-card-subtitle>Type: {{prod.product_name_sub_type}}</ion-card-subtitle>
-          <ion-card-title>{{prod.product_name}}</ion-card-title>
+          <ion-row>
+            <ion-card-subtitle>
+              <ion-chip color="apppersonalized" >
+                <ion-label >
+                  Type: 
+                </ion-label>
+              </ion-chip>
+              <ion-chip class="chip-background">
+                <ion-label color="apppersonalized">
+                   {{prod.product_name_sub_type}}
+                </ion-label>
+              </ion-chip>
+            </ion-card-subtitle>
+            <ion-card-title>
+              <ion-chip color="apppersonalized" >
+                <ion-label >
+                  Name: 
+                </ion-label>
+              </ion-chip>
+              <ion-chip class="chip-background">
+                <ion-label color="apppersonalized">
+                  {{prod.product_name}}
+                </ion-label>
+              </ion-chip>
+            </ion-card-title>
+              <img [id]="prod.id" (click)="goToProduct($event)" class="see"  click src='../../assets/see1.svg'/>
+          </ion-row>
+
         </ion-card-header>
 
-
-
         <ion-card-content>
+
           <ion-row>
             <ion-col size="8">
 
@@ -28,7 +53,7 @@
                 </ion-slide>
               </ion-slides>
 
-             
+
             </ion-col>
             <ion-col size="4">
               <ion-row class="ion-padding-bottom">

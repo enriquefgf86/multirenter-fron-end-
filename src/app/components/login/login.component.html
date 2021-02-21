@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content class="backi">
   <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
     <ion-grid fixed>
       <ion-row>
@@ -36,9 +36,9 @@
     </ion-grid>
 
   </form>
-  <ion-item-group padding class="ion-text-center">
-    <ion-item>
-      <ion-label class="ion-text-center">Aren't you a User?</ion-label>
+  <ion-item-group padding class="ion-text-center ">
+    <ion-item class="backi" > 
+      <ion-label class="ion-text-center backi">Aren't you a User?</ion-label>
     </ion-item>
     <ion-button size="small" color="light" (click)="goToSignUp()">
       <ion-label color="apppersonalized">Go to Register</ion-label>

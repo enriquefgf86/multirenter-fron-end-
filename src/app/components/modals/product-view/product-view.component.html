@@ -1,0 +1,78 @@
+<ion-content class="backi my-modal">
+  <ion-card *ngIf="prodSelected">
+
+    <ion-item color="lightapppersonalized ">
+
+      <ion-label slot="start">
+        <ion-text color="apppersonalized">
+          <h2 style="font-weight: bold;"> {{prodSelected.product_name}}</h2>
+        </ion-text>
+      </ion-label>
+      <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+
+    </ion-item>
+    <ion-grid fixed>
+      <ion-row>
+        <ion-col size="6" size-md='6' size-xl='6' size-lg='6' size-sm='12' size-xs='12'>
+          <ion-row>
+            <ion-col size="6" size-md='6' size-xl='6' size-lg='6' size-sm='12' size-xs='12' >
+              
+              <ion-button [id]="prodSelected.id" size="small" color='lightapppersonalized' *ngIf="prodSelected.product_in_inventary==false&&role=='ROLE_RENTER'"  (click)="rentProduct($event)">
+                Rent
+              </ion-button>
+
+              <ion-chip *ngIf="prodSelected.product_in_inventary==true&&role=='ROLE_RENTER'" class="chip-background">
+                <ion-label color="apppersonalized">Unavailable</ion-label>
+              </ion-chip>
+
+              <ion-chip *ngIf="role=='ROLE_ADMIN'" class="chip-background">
+                <ion-label color="apppersonalized" (click)="routeringAdmin()" >Edit Product</ion-label>
+              </ion-chip>
+
+
+            </ion-col>
+
+            <ion-col size="6" size-md='6' size-xl='6' size-lg='6' size-sm='12' size-xs='12' >
+             
+              <form [formGroup]="commentForm" *ngIf="renterId"  (ngSubmit)="addComment()" #form="ngForm" >
+              
+              <ion-textarea class="textarea-border" type='text' formControlName="commentBody" placeholder="Write a Comment "></ion-textarea>
+              <ion-button *ngIf="commentForm.valid" [disabled]='commentForm.invalid' shape="round" size="small" slot="end" color="transpa" type="submit">
+                <ion-icon    src='./../assets/messagesend.svg'></ion-icon>
+              </ion-button>
+              
+               </form>
+
+            </ion-col>
+          </ion-row>
+          
+        </ion-col>
+        <ion-col size="6" size-md='6' size-xl='6' size-lg='6' size-sm='12' size-xs='12'>
+          
+              <div >
+                <canvas baseChart
+                  [data]="doughnutChartData "
+                  [labels]="doughnutChartLabels"
+                  [chartType]="doughnutChartType">
+                </canvas>
+              </div>
+              <!-- //grafica que calcularia el total de rentas con respecto al toalt de renta de todos
+              los productos. Para ello se tendria que instalar ng2 charts and chart js -->
+           
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12">
+          <ion-chip  class="chip-background" data-toggle="collapse" data-target="#coments">
+            <ion-label [id]="prodSelected.id"  (click)="seeAllComments($event)" color="apppersonalized" >All Comments </ion-label>
+          </ion-chip>
+        </ion-col>
+      </ion-row>
+
+      
+    </ion-grid>
+
+   
+
+  </ion-card>
+</ion-content>

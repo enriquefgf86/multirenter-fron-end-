@@ -43,6 +43,10 @@
   background-color: rgba(255, 255, 255, 0) !important;
 }
 
+.color-button-text {
+  color: white !important;
+}
+
 .ion-color-apppersonalized {
   --ion-color-base: var(--ion-color-apppersonalized);
   --ion-color-base-rgb: var(--ion-color-apppersonalized-rgb);
@@ -67,6 +71,22 @@
   --ion-color-contrast-rgb: var(--ion-color-transparent-contrast-rgb);
   --ion-color-shade: var(--ion-color-transparent-shade);
   --ion-color-tint: var(--ion-color-transparent-tint);
+}
+.ion-color-transpa {
+  --ion-color-base: var(--ion-color-transpa);
+  --ion-color-base-rgb: var(--ion-color-transpa-rgb);
+  --ion-color-contrast: var(--ion-color-transpa-contrast);
+  --ion-color-contrast-rgb: var(--ion-color-transpa-contrast-rgb);
+  --ion-color-shade: var(--ion-color-transpa-shade);
+  --ion-color-tint: var(--ion-color-transpa-tint);
+}
+.popover {
+  div.popover-content {
+    position:absolute;
+    top: 40% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
 }
 
 .my-font-size {
@@ -93,8 +113,8 @@
   background-color: red;
 }
 .card-img-top {
-  width: 100%;
-  height: 9rem;
+  width: 9rem;
+  height: 100%;
   object-fit: cover;
 }
 .card-img-top1 {
@@ -138,7 +158,7 @@
 .backi {
   --background: url("./assets/backgroundApp.jpg") no-repeat center center /
     cover;
-  height: 5rem;
+  // height: 5rem;
   // opacity: 0.5;
 }
 .text-input {
@@ -154,7 +174,50 @@
   background-color: var(--ion-color-lightapppersonalized);
 }
 
+.edit-image-card {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.orientation {
+  position: absolute;
+  margin-top: 3rem;
+  margin-left: 2rem;
+}
+
+.see {
+  width: 2rem;
+  height: 100%;
+  position: relative;
+}
+.text-size {
+  font-size: 0.7rem !important;
+}
+.color-button-transparent {
+  background-color: transparent !important;
+  color: red !important;
+}
+.textarea-border {
+  border-style: inset !important;
+  border-width: 2px !important;
+  border-radius: 20px !important;
+}
+.label-size {
+  font-size: 0.6rem !important;
+}
+.label-size1 {
+  font-size: 0.7rem !important;
+}
+
 ////////////////querys para las imagenes del tab 4//////////
+
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (max-device-width: 780px) {
+  /* Styles */
+  .orientation {
+    display: none;
+  }
+}
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
   /* Styles */

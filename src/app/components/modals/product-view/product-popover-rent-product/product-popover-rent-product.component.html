@@ -1,0 +1,32 @@
+<ion-content>
+  <ion-card-content>
+    <form [formGroup]="rentForm" (ngSubmit)="rentProduct()" #form="ngForm">
+      <ion-item>
+        <ion-label position="floating">Days of Rent</ion-label>
+        <ion-input [(ngModel)]='data.input1' formControlName="rentDays" type="number" (ionChange)="changeInput($event)">
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="data.daysOfRentCost>0">
+        <ion-label position="floating">Rent Import</ion-label>
+        <ion-input formControlName="cost" type="number" [(ngModel)]='data.daysOfRentCost'></ion-input>
+      </ion-item>
+      <!-- //este oinput cumple la fucnion de dar en tiempo real el valor de renta segun los dias
+      puestos en el primer input . Vease que ambos inputs son bindeados aun ngmodel del objeto 
+      data en el ts, sobre el cual se calculan los valores  que cada una de sus variables tiene 
+      cuando se triggeriza el metodo changeInput de  la instancia ionChange del primer input -->
+      
+      <ion-buttons slot="start">
+        <ion-button type="submit">
+          <ion-icon slot="end"></ion-icon>
+          Rent
+        </ion-button>
+        <ion-button (click)="cancelClose()">
+          <ion-icon slot="end"></ion-icon>
+          Cancel
+        </ion-button>
+      </ion-buttons>
+    </form>
+
+  </ion-card-content>
+</ion-content>

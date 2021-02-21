@@ -1,0 +1,52 @@
+<ion-content>
+  <ion-card-content>
+    <form [formGroup]="rentDevolutionForm" (ngSubmit)="rentDevolutionProduct()" #form="ngForm">
+      
+      <ion-item>
+        <ion-label class="lable-size ion-text-wrap" position="floating">Real Days With the Product</ion-label>
+        <ion-input [(ngModel)]='data.realDays' formControlName="rentRealDays" type="number" (ionChange)="changeInput($event)" >
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="data.realDays>0">
+        <ion-label class="lable-size ion-text-wrap"  position="floating">Days of Rent</ion-label>
+        <ion-input *ngIf="data.realDays" [(ngModel)]='data.rentDays' formControlName="rentDays" [readonly]='true'  type="number" >
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="data.realDays>0">
+        <ion-label class="lable-size ion-text-wrap" position="floating">Cost of Rent</ion-label>
+        <ion-input *ngIf="data.realDays" [(ngModel)]='data.rentCost' formControlName="costRent" [readonly]='true' type="number" >
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="data.realDays>0">
+        <ion-label class="lable-size ion-text-wrap" position="floating">Cost For Delay</ion-label>
+        <ion-input *ngIf="data.realDays" [(ngModel)]="data.rentCostDelay " formControlName="costDelay" [readonly]='true' type="number" >
+        </ion-input>
+      </ion-item>
+
+      <ion-item *ngIf="data.realDays>0">
+        <ion-label class="lable-size ion-text-wrap" position="floating">Total Cost</ion-label>
+        <ion-input *ngIf="data.realDays" [(ngModel)]="data.rentTotalCost" formControlName="totalCost" [readonly]='true' type="number" >
+        </ion-input>
+      </ion-item>
+
+      
+      <!-- //este oinput cumple la fucnion de dar en tiempo real el valor de renta segun los dias
+      puestos en el primer input . Vease que ambos inputs son bindeados aun ngmodel del objeto 
+      data en el ts, sobre el cual se calculan los valores  que cada una de sus variables tiene 
+      cuando se triggeriza el metodo changeInput de  la instancia ionChange del primer input -->
+      
+      <!-- <ion-buttons slot="start"> -->
+        <ion-button class="color-button-text" *ngIf="data.realDays>0 " size="small" class="backi" [disabled]="rentDevolutionForm.invalid"color="lightapppersonalized" type="submit">
+          Ok
+        </ion-button>
+        <ion-button style="color:white !important" size="small" class="backi" color="lightapppersonalized" (click)="cancelClose()">
+          Cancel
+        </ion-button>
+      <!-- </ion-buttons> -->
+    </form>
+    
+  </ion-card-content>
+</ion-content>

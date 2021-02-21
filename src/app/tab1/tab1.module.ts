@@ -1,3 +1,4 @@
+import { ModalsModuleModule } from "../components/modals/modals-module.module";
 //Pipe de imagen se importa aqui tambien pues uno de los componentes
 //del page (all-Products requiere de dicho pipe)
 import { PipeModule } from "./../pipes/pipe.module";
@@ -23,6 +24,7 @@ import { Tab1PageRoutingModule } from "./tab1-routing.module";
     FormsModule,
     Tab1PageRoutingModule,
     PipeModule,
+    ModalsModuleModule,
   ],
   declarations: [Tab1Page, ProductCardComponent, AllProductsCardsComponent],
 })

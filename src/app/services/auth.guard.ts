@@ -23,16 +23,30 @@ export class AuthGuard implements CanActivate {
     private storage: StorageService,
     private stateStore: Store
   ) {}
-  canActivate(): Observable<boolean> {
-    return this.httpServices.isAuth().pipe(
-      tap((state) => {
-        console.log(state);
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+    
+    return  this.httpServices.renewToken()
+    .pipe(
+      tap((isAuth) => {
+        console.log(isAuth);
 
-        if (!state) {
+        if (!isAuth) {
           this.routering.navigate(["/tabs/tab6"]);
         }
       })
-    );
+    ); 
+    // return this.httpServices.isAuth().pipe(
+    //   tap((state) => {
+    //     console.log(state);
+
+    //     if (!state) {
+    //       this.routering.navigate(["/tabs/tab6"]);
+    //     }
+    //   })
+    // );
   }
   //Este guardian accederia al servicio y en el a una de los metodos
   //encargados de derminar si el usuario esta autenticado o no , verificando su estado

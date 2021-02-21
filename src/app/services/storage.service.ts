@@ -21,15 +21,17 @@ export class StorageService {
   userInStorage: boolean;
   productsTypeInStorage: AllProductsType[];
   productsSubTypeInStorage: AllProductsSubType[];
-  imgSubTypeInStorage:AllImage[];
+  imgSubTypeInStorage: AllImage[];
 
   constructor(private storage: Storage) {}
 
   /////////////////////////////////////////////////////clean storage///////////////////////////////////////////
-  cleanStorage() {
-    this.storage.remove("token");
-    this.storage.remove("tokenDecoded");
-    this.storage.remove("userIsAuth");
+  async cleanStorage() {
+    
+      await this.storage.remove("token").then(()=>console.log("token removed")),
+      await this.storage.remove("tokenDecoded").then(()=>console.log("token removed")),
+      await this.storage.remove("userIsAuth").then(()=>console.log("token removed"))
+    
   }
   //service que posibilita la limpiezadel token generado en el storage
 
@@ -81,22 +83,21 @@ export class StorageService {
   }
   //obteniendo el listatdo de tipos de producto en el storage
 
-    /////////////////////////////////////////////////////get prod type in Storage///////////////////////////////////////////
-    getImgsSubTypeInStorage() {
-      return this.storage.get("imagesSubTypes").then((imgSubType) => {
-        // console.log(imgSubType);
-  
-        if (!imgSubType || imgSubType == null) {
-          imgSubType = [];
-        }
-        this.imgSubTypeInStorage = imgSubType;
-        console.log(this.tokenInStorage);
-  
-        return this.imgSubTypeInStorage;
-      });
-    }
-    //obteniendo el listatdo de tipos de producto en el storage
-  
+  /////////////////////////////////////////////////////get prod type in Storage///////////////////////////////////////////
+  getImgsSubTypeInStorage() {
+    return this.storage.get("imagesSubTypes").then((imgSubType) => {
+      // console.log(imgSubType);
+
+      if (!imgSubType || imgSubType == null) {
+        imgSubType = [];
+      }
+      this.imgSubTypeInStorage = imgSubType;
+      console.log(this.tokenInStorage);
+
+      return this.imgSubTypeInStorage;
+    });
+  }
+  //obteniendo el listatdo de tipos de producto en el storage
 
   /////////////////////////////////////////////////////get user auth in storage///////////////////////////////////////////
   getUserIsAuthStorage() {
@@ -181,7 +182,7 @@ export class StorageService {
     });
   }
   //seteando el listado de imagenes  en el storage
-  
+
   isValidtoken(): tokengenerated {
     let token: tokengenerated;
     this.storage

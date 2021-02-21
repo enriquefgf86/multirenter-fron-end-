@@ -1,0 +1,31 @@
+<ion-content >
+  <ion-item color="lightapppersonalized">
+    <ion-label slot="start">
+      <ion-text color="apppersonalized">
+        <h2 style="font-weight: bold;"> Settings Edit Image</h2>
+      </ion-text>
+    </ion-label>
+    <ion-icon (click)="dismiss()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+  </ion-item>
+
+  <ion-content class="backi" >
+    <ion-grid *ngIf="allImages.length>0">
+      <ion-row class="ion-wrap">
+        <ion-col size='6' size-lg="3" size-xl="4" size-md="6" size-sm="6" *ngFor="let img of allImages ">
+            <ion-card  type="ios">
+              <ion-header >
+                <ion-toolbar color="lightapppersonalized">
+                  <ion-title size="small" color="apppersonalized">{{img.url|pipeTitleFormat}}</ion-title>
+                </ion-toolbar>
+              </ion-header>
+              <ion-img  [src]="(img.url | pipeImagen |async)"></ion-img>
+              <ion-button class="backi" [id]="img.id" (click)="goToImage($event)"  size="small" color="lightapppersonalized">
+                  Edit
+              </ion-button>
+            </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-content>
+
+</ion-content>

@@ -93,6 +93,7 @@ const _authReducer = createReducer(
     decodedToken: null,
     token: null,
     userAuth: null,
+    dedToken:null
   }))
   //metodod que triggeriza el reseteo de todas la variables del store a su valor de
   //initial state  a traves del metodo resetStore, establecidnose  el item reset stroe como true

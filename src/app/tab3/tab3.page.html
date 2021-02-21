@@ -1,25 +1,76 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="apppersonalized">
-    <ion-title size="small" slot='end' class='toolbar-mini-padding'>My Dash</ion-title>
+    <ion-title size="small" slot='end' class='toolbar-mini-padding' color="light">My Dash</ion-title>
     <ion-icon slot='end' src='../../assets/dashboard.svg' size='large'></ion-icon>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+  <ion-content class="backi" [fullscreen]="true">
 
-  <ion-item>
-    <ion-avatar slot="start">
-      <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
-    </ion-avatar>
-    <ion-label>Item Avatar</ion-label>
-  </ion-item>
-
-  <ion-chip>
-    <ion-avatar>
-      <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
-    </ion-avatar>
-    <ion-label>Chip Avatar</ion-label>
-  </ion-chip>
-
-
-</ion-content>
+    <ion-fab vertical="top" horizontal="start" slot="fixed">
+      <ion-chip class="chip-background" mode="ios" >
+    
+        <ion-avatar  >
+          <img *ngIf="!imageDefault" src='../../assets/defaultUser.png' alt="default">
+          <img *ngIf="imageDefault"  [src]="image" />
+        </ion-avatar>
+        <ion-label color="apppersonalized">Welcome {{renterName?renterName:""}}</ion-label>
+        
+      </ion-chip>
+    </ion-fab>
+  
+    <ion-grid fixed>
+  
+      <ion-row>
+        <ion-col size="12">
+          <ion-chip class="chip-background">
+            <ion-label color="apppersonalized">
+              Active Rents
+            </ion-label>
+          </ion-chip>
+        </ion-col>
+      </ion-row>
+  
+      <ion-row>
+  
+        <ion-col size="6" color="apppersonalized">
+          <div class="div-button-edition " color="apppersonalized">
+            <img class="centered-button" (click)="seeRentsInprocess()" src="../../assets/inProcess.png" alt="imge">
+            <ion-chip class="chip-background orientation " (click)="seeRentsInprocess()">
+              <ion-label color="apppersonalized">
+                See Active Rents
+              </ion-label>
+            </ion-chip>
+          </div>
+        </ion-col>
+  
+      </ion-row>
+  
+      <ion-row>
+        <ion-col size="12">
+          <ion-chip class="chip-background">
+            <ion-label color="apppersonalized">
+              All Rents 
+            </ion-label>
+          </ion-chip>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+  
+        <ion-col size="6">
+          <div class="div-button-edition " color="apppersonalized">
+            <img class="centered-button" (click)="seeAllRents()" expand="block" fill="clear" shape="round"
+              src="../../assets/rents.png" alt="imge">
+            <ion-chip class="chip-background orientation " (click)="seeAllRents()">
+              <ion-label color="apppersonalized">
+                All Rents
+              </ion-label>
+            </ion-chip>
+          </div>
+        </ion-col>
+  
+      </ion-row>
+  
+    </ion-grid>
+  
+  </ion-content>

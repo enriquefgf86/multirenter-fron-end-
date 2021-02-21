@@ -38,7 +38,7 @@ export class CreateProductSubtypeComponent implements OnInit {
               return data.allProductsSubType[key];
             }
           );
-          console.log(this.allProdSubTypes);
+          //console.log(this.allProdSubTypes);
         }
       });
     });

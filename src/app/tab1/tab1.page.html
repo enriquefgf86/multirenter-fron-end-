@@ -1,22 +1,24 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="apppersonalized">
-    <ion-title size="small" slot='end' class='toolbar-mini-padding'>Home</ion-title>
+    <ion-title size="small" slot='end' class='toolbar-mini-padding' color="light">Home</ion-title>
     <ion-icon slot='end' src='../../assets/home.svg' size='large'></ion-icon>
   </ion-toolbar>
 
 </ion-header>
 
 <ion-content [fullscreen]="true" class="backi">
-  <ion-chip color="apppersonalized" mode="ios" outline="true">
+  <ion-fab vertical="top" horizontal="start" slot="fixed">
+    <ion-chip class="chip-background" mode="ios" >
   
-    <ion-avatar >
-      <img *ngIf="!imageDefault" src='../../assets/defaultUser.png' alt="default">
-      <img *ngIf="imageDefault"  [src]="image" />
-    </ion-avatar>
-    <ion-label>Welcome {{renterName}}</ion-label>
-    
-  </ion-chip>
+      <ion-avatar  >
+        <img *ngIf="!imageDefault" src='../../assets/defaultUser.png' alt="default">
+        <img *ngIf="imageDefault"  [src]="image" />
+      </ion-avatar>
+      <ion-label color="apppersonalized">Welcome {{renterName?renterName:""}}</ion-label>
+      
+    </ion-chip>
+  </ion-fab>
+ 
 
-  <button (click)="renew()">renw</button>
 <app-all-products-cards></app-all-products-cards>
 </ion-content>

@@ -16,8 +16,13 @@ export class PipeImagenPipe implements PipeTransform {
       .toPromise()
       .then((result) => {
         string = result;
+      })
+      .catch((error) => {
+        if (error) {
+          string = "../../assets/defaultUser.png";
+        }
       });
-    console.log(string);
+    // console.log(string);
     return string;
   }
   //este archivo seria el encargado de transmutar las images traidas desde firebase mediante

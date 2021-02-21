@@ -56,7 +56,7 @@ export class CreateProductComponent implements OnInit {
       productPrice,
       productFeeDelay,
     } = await this.createProdForm.value;
-    console.log(this.createProdForm.value, renterId);
+    //console.log(this.createProdForm.value, renterId);
 
     await this.httpService.createProduct(
       productName,
@@ -76,7 +76,7 @@ export class CreateProductComponent implements OnInit {
         this.pricesProduct = Object.keys(data.allPricesProducts).map((key) => {
           return data.allPricesProducts[key];
         });
-        console.log(this.pricesProduct);
+        //console.log(this.pricesProduct);
       }
     });
   }
@@ -91,7 +91,7 @@ export class CreateProductComponent implements OnInit {
         this.feesProduct = Object.keys(data.allFeesProducts).map((key) => {
           return data.allFeesProducts[key];
         });
-        console.log(this.feesProduct);
+        //console.log(this.feesProduct);
       }
     });
   }
@@ -106,7 +106,7 @@ export class CreateProductComponent implements OnInit {
         this.productType = Object.keys(data.allProductsType).map((key) => {
           return data.allProductsType[key];
         });
-        console.log(this.productType);
+        //console.log(this.productType);
       }
     });
   }
@@ -123,7 +123,7 @@ export class CreateProductComponent implements OnInit {
             return data.allProductsSubType[key];
           }
         );
-        console.log(this.productSubType);
+        //console.log(this.productSubType);
       }
     });
   }

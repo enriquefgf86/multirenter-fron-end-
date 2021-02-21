@@ -27,6 +27,10 @@ import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 //pipes imagen
 import { PipeModule } from "./pipes/pipe.module";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+// Import the library
+import { NgxStripeModule } from 'ngx-stripe';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,17 +41,24 @@ import { PipeModule } from "./pipes/pipe.module";
     BrowserModule,
     FormsModule,
     IonicModule.forRoot(),
+    NgxStripeModule.forRoot(environment.stripeApiKeyPublic),
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
     IonicStorageModule.forRoot(),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
-    StoreModule.forRoot(globalReducer),
+    StoreModule.forRoot(globalReducer,{
+      runtimeChecks: {
+        strictStateImmutability: false,
+        strictActionImmutability: false,
+      },
+    }),
     StoreDevtoolsModule.instrument({
       maxAge: 25, // Retains last 25 states
       logOnly: environment.production, // Restrict extension to log-only mode
     }),
+    BrowserAnimationsModule,
   ],
   providers: [
     StatusBar,

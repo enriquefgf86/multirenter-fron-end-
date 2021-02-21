@@ -1,16 +1,16 @@
 <ion-header>
   <ion-toolbar color="apppersonalized">
-    <ion-title size="small" slot='end' class='toolbar-mini-padding'>Admin Dash</ion-title>
+    <ion-title size="small" slot='end' class='toolbar-mini-padding' color="light">Admin Dash</ion-title>
     <ion-icon slot='end' src='../../assets/admin.svg' size='large'></ion-icon>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="backi">
   <ion-grid fixed>
-   
+
     <ion-row>
       <ion-col size="12">
-        <ion-chip color="apppersonalized">
+        <ion-chip class="chip-background">
           <ion-label color="apppersonalized">
             Create
           </ion-label>
@@ -22,13 +22,23 @@
 
       <ion-col size="6" color="apppersonalized">
         <div class="div-button-edition " color="apppersonalized">
-            <img class="centered-button" (click)="editImage()"  src="../../assets/addImg.png" alt="imge">
+          <img class="centered-button" (click)="createImage()" src="../../assets/addImg.png" alt="imge">
+          <ion-chip class="chip-background orientation " (click)="createImage()">
+            <ion-label color="apppersonalized">
+              Create image
+            </ion-label>
+          </ion-chip>
         </div>
       </ion-col>
 
       <ion-col size="6">
-          <div class="div-button-edition " color="apppersonalized">
-            <img class="centered-button" (click)="referingToProduct()"  src="../../assets/addProduct.png" alt="imge">
+        <div class="div-button-edition " color="apppersonalized">
+          <img class="centered-button" (click)="referingToProduct()" src="../../assets/addProduct.png" alt="imge">
+          <ion-chip class="chip-background orientation" (click)="referingToProduct()" >
+            <ion-label color="apppersonalized">
+              Create Product
+            </ion-label>
+          </ion-chip>
         </div>
       </ion-col>
 
@@ -36,7 +46,7 @@
 
     <ion-row>
       <ion-col size="12">
-        <ion-chip color="apppersonalized">
+        <ion-chip class="chip-background">
           <ion-label color="apppersonalized">
             Edit
           </ion-label>
@@ -46,23 +56,35 @@
     <ion-row>
 
       <ion-col size="6">
-          <div class="div-button-edition " color="apppersonalized">
-              <img class="centered-button" (click)="editProducts()" expand="block" fill="clear" shape="round" src="../../assets/editProduct.png" alt="imge">
-
+        <div class="div-button-edition " color="apppersonalized">
+          <img class="centered-button" (click)="editProducts()" expand="block" fill="clear" shape="round"
+            src="../../assets/editProduct.png" alt="imge">
+          <ion-chip class="chip-background orientation " (click)="editProducts()">
+            <ion-label color="apppersonalized">
+              Edit Product
+            </ion-label>
+          </ion-chip>
         </div>
       </ion-col>
 
       <ion-col size="6">
         <div class="div-button-edition " color="apppersonalized">
-          <img class="centered-button" (click)="editProducts()" expand="block" fill="clear" shape="round" src="../../assets/editImg.png" alt="imge">
-      </div>
+          <img class="centered-button" (click)="editImage()" expand="block" fill="clear" shape="round"
+            src="../../assets/editImg.png" alt="imge">
+          <ion-chip class="chip-background orientation " (click)="editImage()">
+            <ion-label color="apppersonalized">
+              Edit Images
+            </ion-label>
+          </ion-chip>
+
+        </div>
       </ion-col>
 
     </ion-row>
 
     <ion-row>
       <ion-col size="12">
-        <ion-chip color="apppersonalized">
+        <ion-chip class="chip-background">
           <ion-label color="apppersonalized">
             Delete
           </ion-label>
@@ -73,11 +95,17 @@
 
       <ion-col size="6" class="col-6 offset-3 text-center">
         <div class="div-button-edition " color="apppersonalized">
-          <img class="centered-button" (click)="editProducts()" expand="block" fill="clear" shape="round" src="../../assets/deleteUser.png" alt="imge">
-      </div>
+          <img class="centered-button" (click)="editRenters()" expand="block" fill="clear" shape="round"
+            src="../../assets/deleteUser.png" alt="imge">
+          <ion-chip class="chip-background orientation " (click)="editRenters()">
+            <ion-label color="apppersonalized">
+              Delete User
+            </ion-label>
+          </ion-chip>
+        </div>
       </ion-col>
 
-      
+
     </ion-row>
   </ion-grid>
 

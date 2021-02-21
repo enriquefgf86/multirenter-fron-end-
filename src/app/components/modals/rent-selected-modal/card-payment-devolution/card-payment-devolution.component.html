@@ -1,0 +1,28 @@
+<ion-content>
+  <ion-card>
+    <ion-card-content *ngIf="rentDays < rentRealDays">
+      <form novalidate (ngSubmit)="payDevolutionDelay()" [formGroup]="stripeTest">
+        <input type="text" formControlName="name" placeholder="Your name">
+        <ngx-stripe-card [options]="cardOptions" [elementsOptions]="elementsOptions"></ngx-stripe-card>
+        <ion-button type="submit"  fill="clear" shape="round">
+          Pay
+        </ion-button>
+        
+      </form>
+    </ion-card-content>
+    <!-- mostrando el card que calcula el payment con devolucion y fee -->
+
+    <ion-card-content *ngIf="rentDays >= rentRealDays">
+      <form novalidate (ngSubmit)="payDevolutionDelay()" [formGroup]="stripeTest">
+        <!-- <input type="text" formControlName="name" placeholder="Your name"> -->
+        <!-- <ngx-stripe-card [options]="cardOptions" [elementsOptions]="elementsOptions"></ngx-stripe-card> -->
+        <ion-button type="submit"  fill="clear" shape="round">
+          Pay
+        </ion-button>
+        
+      </form>
+    </ion-card-content>
+        <!-- mostrando el card que calcula el payment con devolucion sin  fee -->
+
+  </ion-card>
+</ion-content>

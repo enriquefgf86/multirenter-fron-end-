@@ -13,5 +13,6 @@ export const environment = {
     storageBucket: "userimgsionmicromultirenter.appspot.com",
     messagingSenderId: "782040709393",
     appId: "1:782040709393:web:7b0dc6ec99e495dff574b0"
-  }
+  },
+  stripeApiKeyPublic:"pk_test_51HKKJsFEOxZLmvASfbB8PUqkGXcnBMLKPkL6pPGNMrSXDJWCyiIUnphVg6raljAgkddDrfY4oa0zQCFtswgGlaZd00kX8RJwqH"
 };

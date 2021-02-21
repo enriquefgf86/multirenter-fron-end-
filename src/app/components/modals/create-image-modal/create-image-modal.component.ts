@@ -26,13 +26,13 @@ export class CreateImageModalComponent implements OnInit {
   optionSelected: AllProductsSubType = null;
   imgSelected: any;
   imgByClasification: any[] = [];
-  imgHeaders:any;
+  imgHeaders: any;
 
   sliderOptions = {
     slidesPerView: 1.4,
     freeMode: true,
     autoplay: true,
-    spaceBetween:-420
+    spaceBetween: -420,
   };
 
   @ViewChild("option") optionValue: ElementRef;
@@ -55,12 +55,16 @@ export class CreateImageModalComponent implements OnInit {
     //de una imagen
 
     this.stateStore.select("prodReducers").subscribe((data) => {
-      this.allProdSubtypes = Object.keys(data.allProductsSubType).map((key) => {
-        return data.allProductsSubType[key];
-      });
+      if (data.allProductsSubType) {
+        this.allProdSubtypes = Object.keys(data.allProductsSubType).map(
+          (key) => {
+            return data.allProductsSubType[key];
+          }
+        );
 
-      console.log(this.allProdSubtypes);
-      console.log(this.optionValue);
+        //console.log(this.allProdSubtypes);
+        //console.log(this.optionValue);
+      }
     });
     //convirtiendo un objeto de objetos a un array de objetos suscribiendonos all prodReducer
     //que traeria  el objeto de objeto referente a los tipos de subproductos , y mediante el
@@ -76,7 +80,7 @@ export class CreateImageModalComponent implements OnInit {
         (this.defaultImage = await imgCharger.target.result);
       await imageReader.readAsDataURL(event.target.files[0]);
       this.imgSelected = await event.target.files[0];
-      console.log(this.imgSelected);
+      //console.log(this.imgSelected);
     } else {
       this.defaultImage = await "/assets/imgs/defaultUser.png";
       this.imgSelected = await null;
@@ -125,7 +129,7 @@ export class CreateImageModalComponent implements OnInit {
     const refStorage = await this.imgSubTypeUpLoader.ref(
       imgSubTypeFireStoragePath
     );
-    console.log(imgSubTypeFireStoragePath);
+    //console.log(imgSubTypeFireStoragePath);
     //estableciendo variable que fije la referencia al camino de la imagen del usuario en storage
 
     let userAdminCreatingImage: number;
@@ -137,8 +141,8 @@ export class CreateImageModalComponent implements OnInit {
     });
     //obteneindose el usuario que crea la imagen
 
-    console.log(this.createImgForm.value);
-    console.log(userAdminCreatingImage);
+    //console.log(this.createImgForm.value);
+    //console.log(userAdminCreatingImage);
 
     await this.httpService
       .createImage(url, productSubTypeId, userAdminCreatingImage)
@@ -153,7 +157,7 @@ export class CreateImageModalComponent implements OnInit {
               .toPromise()
               .then((urlImg) => {
                 if (urlImg) {
-                  console.log(urlImg);
+                  //console.log(urlImg);
                 }
               });
           });
@@ -171,7 +175,7 @@ export class CreateImageModalComponent implements OnInit {
   }
 
   change(event) {
-    console.log(event);
+    //console.log(event);
   }
 
   dismiss() {
@@ -188,41 +192,42 @@ export class CreateImageModalComponent implements OnInit {
 
   getArrayOfImgSubTypes() {
     this.stateStore.select("prodReducers").subscribe(async (data) => {
-      console.log(data.allImgSubType);
+      //console.log(data.allImgSubType);
       let arrayOfimgSubClasif = [];
+      let arrayOfImgSubTypes = [];
+      if (data.allImgSubType) {
+        arrayOfImgSubTypes = await Object.keys(data.allImgSubType).map(
+          (result) => {
+            return data.allImgSubType[result];
+          }
+        );
+        //conviertiendo el traido desde el reducer , y convirtiendolo a un array de
+        //objectos asignandolo a la variable arrayOfImgSubTypes
 
-      let arrayOfImgSubTypes = await Object.keys(data.allImgSubType).map(
-        (result) => {
-          return data.allImgSubType[result];
-        }
-      );
-      //conviertiendo el traido desde el reducer , y convirtiendolo a un array de
-      //objectos asignandolo a la variable arrayOfImgSubTypes
+        arrayOfimgSubClasif = arrayOfImgSubTypes.reduce((r, a) => {
+          let reducido = a.url.split("/")[0];
+          r[reducido] = r[reducido] || [];
+          r[reducido].push(a);
+          return r;
+        }, Object.create(null));
+        //convirtiendo de nuevo a objeto de objetos el array de objetos  convertido previamente crando
+        //un objeto de objetos segun el tipo de imagen, pero antes  designado y agrupando por ti[po]
 
-      arrayOfimgSubClasif = arrayOfImgSubTypes.reduce((r, a) => {
-        let reducido=a.url.split('/')[0]
-        r[reducido] = r[reducido] || [];
-        r[reducido].push(a);
-        return r;
-      }, Object.create(null));
-      //convirtiendo de nuevo a objeto de objetos el array de objetos  convertido previamente crando
-      //un objeto de objetos segun el tipo de imagen, pero antes  designado y agrupando por ti[po]
+        let newArray = await Object.keys(arrayOfimgSubClasif).map((result) => {
+          return arrayOfimgSubClasif[result];
+        });
 
-      let newArray = await Object.keys(arrayOfimgSubClasif).map((result) => {
-        return arrayOfimgSubClasif[result];
-      });
-
-      console.log(arrayOfImgSubTypes);
-      console.log(arrayOfimgSubClasif);
-      this.imgByClasification = newArray;
-      this.imgHeaders=arrayOfimgSubClasif
-      console.log(this.imgByClasification);
-      console.log(this.imgHeaders);
+        //console.log(arrayOfImgSubTypes);
+        //console.log(arrayOfimgSubClasif);
+        this.imgByClasification = newArray;
+        this.imgHeaders = arrayOfimgSubClasif;
+        //console.log(this.imgByClasification);
+        //console.log(this.imgHeaders);
+      }
     });
   }
 
-  onClick(event){
-    console.log(event);
-    
+  onClick(event) {
+    //console.log(event);
   }
 }

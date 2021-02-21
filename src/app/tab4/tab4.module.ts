@@ -1,3 +1,4 @@
+import { PipeTitleFormatPipe } from './../pipes/pipe-title-format.pipe';
 import { EditProductTypeSelectedComponent } from './../components/modals/edit-product-settings/edit-product-type/edit-product-type-selected/edit-product-type-selected.component';
 import { EditProductTypeComponent } from "./../components/modals/edit-product-settings/edit-product-type/edit-product-type.component";
 import { ProductSelectedComponent } from "./../components/modals/edit-product-settings/edit-product/product-selected/product-selected.component";

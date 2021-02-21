@@ -33,11 +33,12 @@ export class Tab1Page implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.storageService.getTokenInStorage().then((data) => {
-      console.log(data);
+    this.storageService.getTokenInStorage()
+    .then((data) => {
+      // console.log(data);
 
       this.httpServices.userIsauthenticated().subscribe((result) => {
-        console.log(result);
+        // console.log(result);
       });
     });
 
@@ -70,14 +71,5 @@ export class Tab1Page implements OnInit {
     this.httpServices.getAllimgSubTypes();
   }
 
-  async renew() {
-    this.storage.get("token").then((token) => {
-      console.log(token);
-
-      if (!token || token == null) {
-        token = [];
-      }
-      this.httpServices.renewToken(token.refresh_token);
-    });
-  }
+ 
 }

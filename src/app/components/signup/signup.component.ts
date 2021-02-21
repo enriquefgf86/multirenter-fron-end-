@@ -10,7 +10,7 @@ import { Component, OnInit } from "@angular/core";
 //ionic gui components
 import { ImagePicker } from "@ionic-native/image-picker/ngx";
 import { Camera, CameraOptions } from "@ionic-native/camera/ngx";
-import { LoadingController } from "@ionic/angular";
+import { LoadingController, ToastController } from "@ionic/angular";
 //firebase
 import { AngularFireStorage } from "@angular/fire/storage";
 //redux
@@ -40,7 +40,8 @@ export class SignupComponent implements OnInit {
     private routering: Router,
     private loadingController: LoadingController,
     private storageService: StorageService,
-    private stateStore: Store<GlobalAppState>
+    private stateStore: Store<GlobalAppState>,
+    private toastController:ToastController
   ) {}
 
   ngOnInit() {
@@ -127,39 +128,51 @@ export class SignupComponent implements OnInit {
       .signUpUser(renterEmail, renterName, renterPassword, renterImg)
       .toPromise()
       .then(async (data) => {
-        await data;
-        await this.httpServices.loginUser(renterName, renterPassword);
+        if (data) {
+         
+          let message ="User Created"
+          this.presentToast(message);
+          // presentando taster con la finalizacion de la accion 
+  
+          
+          await this.httpServices.loginUser(renterName, renterPassword);
 
-        await this.imgUploader
-          .upload(imgFireStoragePath, this.imgSelected)
-          .snapshotChanges()
-          .subscribe((result) => {
-            refStorage
-              .getDownloadURL()
-              .toPromise()
-              .then((urlImg: url) => {
-                if (urlImg) {
-                  console.log(urlImg);
-                  this.stateStore.dispatch(
-                    actionsAuth.setImageRenter({ imageRenter: urlImg })
-                  );
-                  this.signUpForm.value.renterImg = urlImg;
-                }
-              });
-          });
-        //metodo que sube la imagen a firebase y a la vez la descarga una vez instaurada
-        //asignandosele su valor al item del reactive form renterImg
+           this.imgUploader
+            .upload(imgFireStoragePath, this.imgSelected)
+            .snapshotChanges()
+            .subscribe((result) => {
+              refStorage
+                .getDownloadURL()
+                .toPromise()
+                .then((urlImg: url) => {
+                  if (urlImg) {
+                    console.log(urlImg);
+                    this.stateStore.dispatch(
+                      actionsAuth.setImageRenter({ imageRenter: urlImg })
+                    );
+                    this.signUpForm.value.renterImg = urlImg;
+                  }
+                });
+            });
+          //metodo que sube la imagen a firebase y a la vez la descarga una vez instaurada
+          //asignandosele su valor al item del reactive form renterImg
 
-        await console.log(data);
-        await loading.dismiss();
-        //parando el loader cuando se ejecute exitosamente los metodos anteriores
+          console.log(data);
+          loading.dismiss();
+          //parando el loader cuando se ejecute exitosamente los metodos anteriores
 
-        this.routering.navigate(["/tabs/tab1"]);
-        //redireccionando a la pagina
+          this.routering.navigate(["/tabs/tab1"]);
+          //redireccionando a la pagina
+        }
       })
       .catch((error) => {
         loading.dismiss();
         console.log(error);
+        if(error.error=="invalid_grant"){
+          let message="This user has bad credentials, get in touch with administrator"
+          this.presentToast(message)
+          this.goToLogin()
+        }
       });
     //proceso de creacion de y a la vez de login del usuario
   }
@@ -170,4 +183,13 @@ export class SignupComponent implements OnInit {
     this.routering.navigate(["/tabs/tab6"]);
   }
   //metodo que redirecciona a login
+
+    ////////////////////////////////////////notificador toast de fin de acciones///////
+    async presentToast(message: string) {
+      const toast = await this.toastController.create({
+        message: message,
+        duration: 5000,
+      });
+      toast.present();
+    }
 }

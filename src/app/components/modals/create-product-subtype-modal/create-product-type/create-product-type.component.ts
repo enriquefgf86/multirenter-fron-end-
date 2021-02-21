@@ -41,7 +41,7 @@ export class CreateProductTypeComponent implements OnInit {
               return data.allProductsType[key];
             }
           );
-          console.log(this.allProdTypes);
+          //console.log(this.allProdTypes);
         }
       });
     });

@@ -1,0 +1,37 @@
+<ion-content class="backi my-modal">
+  <ion-card>
+
+    <ion-item color="lightapppersonalized ">
+
+      <ion-label slot="start">
+        <ion-text color="apppersonalized">
+          <h2 style="font-weight: bold;">Deleting User</h2>
+        </ion-text>
+      </ion-label>
+      <ion-icon (click)="closeCreateProdModal()" slot="end" src="./assets/closeButton.svg"></ion-icon>
+
+    </ion-item>
+
+    <form  (ngSubmit)="deleteUserSelected()" #form="ngForm" *ngIf="userSelected.length>0">
+
+      <ion-item color="lightapppersonalized ">
+          <img [src]='userSelected[0].renterImg|pipeImagen|async' />
+
+
+
+      </ion-item>
+
+
+
+      <div class="flex-ionic" color="lightapppersonalized ">
+        <ion-button color="apppersonalized " type="submit">
+          <ion-text style="color:white">
+            Disable User?
+          </ion-text>
+        </ion-button>
+      </div>
+
+    </form>
+
+  </ion-card>
+</ion-content>

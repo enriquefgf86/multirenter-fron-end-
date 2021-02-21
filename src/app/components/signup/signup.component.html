@@ -1,4 +1,4 @@
-<ion-content>
+<ion-content class="backi" >
   <ion-grid fixed>
     <ion-row class="ion-justify-content-center">
       <ion-col>
@@ -23,14 +23,7 @@
                         <img [src]='defaultImage' width='80' height='80' (click)='imageUpload.click()'>
                       </ion-avatar>
                     </ion-col>
-                    <ion-col size="3">
-                      <img class="img-upload" src="../../../assets/upload .png" alt="upload"
-                        (click)="imageUpload.click()">
-
-                    </ion-col>
-                    <ion-col size="6">
-                      <ion-label>Upload Image</ion-label>
-                    </ion-col>
+                    <img width='40' height='40' mode="ios" (click)='imageUpload.click()' src="./assets/edit.svg" />
                   </ion-row>
 
                   <ion-item class="form-group col-md-12 mx-auto" style="display:none">
@@ -66,7 +59,7 @@
 
         </form>
         <ion-item-group padding class="ion-text-center">
-          <ion-item>
+          <ion-item class="backi" >
             <ion-label class="ion-text-center">Are you a User?</ion-label>
           </ion-item>
           <ion-button size="small" color="light" (click)="goToLogin()">
